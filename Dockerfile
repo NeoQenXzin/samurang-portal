@@ -17,8 +17,8 @@ COPY . .
 RUN composer install --no-scripts --no-autoloader
 RUN composer dump-autoload --optimize
 # Install Symfony CLI
-RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | sh
-RUN apk add symfony-cli
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash
+RUN apt-get install symfony-cli
 
 RUN chown -R www-data:www-data /var/www
 RUN chmod -R 755 /var/www/var
