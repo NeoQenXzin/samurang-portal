@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: StudentRepository::class)]
-class Student extends UserModel
+class Student extends UserModel 
 {
     #[ORM\ManyToOne(inversedBy: 'students')]
     private ?Instructor $instructor = null;

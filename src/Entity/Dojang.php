@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DojangRepository::class)]
-class Dojang
+class Dojang implements \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -32,6 +32,10 @@ class Dojang
         $this->samurangs = new ArrayCollection();
     }
 
+    public function __toString(): string
+{
+    return $this->getName();
+}
     public function getId(): ?int
     {
         return $this->id;

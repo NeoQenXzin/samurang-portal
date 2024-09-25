@@ -7,8 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 
 #[MappedSuperclass]
-class UserModel
+class UserModel implements \Stringable
 {
+
+    public function __toString(): string
+{
+    return $this->getFirstName() . ' ' . $this->getLastName() . ' (' . $this->getMail() . ')';
+}
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

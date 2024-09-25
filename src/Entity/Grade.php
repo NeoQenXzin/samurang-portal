@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GradeRepository::class)]
-class Grade
+class Grade implements \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -27,6 +27,11 @@ class Grade
     public function __construct()
     {
         $this->userModels = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName();
     }
 
     public function getId(): ?int
