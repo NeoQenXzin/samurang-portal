@@ -13,9 +13,13 @@ security:
             entity:
                 class: App\Entity\Instructor
                 property: mail
+        student_provider:
+            entity:
+                class: App\Entity\Student
+                property: mail
         app_user_provider:
             chain:
-                providers: ['admin_provider', 'instructor_provider']
+                providers: ['admin_provider', 'instructor_provider', 'student_provider']
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -43,7 +47,7 @@ security:
     access_control:
          - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/mydojang, roles: ROLE_INSTRUCTOR }
-         - { path: ^/profile, roles: ROLE_USER }
+         - { path: ^/profile, roles: ROLE_STUDENT }
 
 when@test:
     security:
