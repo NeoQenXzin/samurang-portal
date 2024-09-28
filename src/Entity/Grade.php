@@ -18,15 +18,16 @@ class Grade implements \Stringable
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    /**
-     * @var Collection<int, UserModel>
-     */
-    #[ORM\OneToMany(targetEntity: UserModel::class, mappedBy: 'grade')]
-    private Collection $userModels;
+    #[ORM\OneToMany(targetEntity: Instructor::class, mappedBy: 'grade')]
+    private Collection $instructors;
+
+    #[ORM\OneToMany(targetEntity: Student::class, mappedBy: 'grade')]
+    private Collection $students;
 
     public function __construct()
     {
-        $this->userModels = new ArrayCollection();
+        $this->instructors = new ArrayCollection();
+        $this->students = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -52,29 +53,57 @@ class Grade implements \Stringable
     }
 
     /**
-     * @return Collection<int, UserModel>
+     * @return Collection<int, Instructor>
      */
-    public function getUserModels(): Collection
+    public function getInstructors(): Collection
     {
-        return $this->userModels;
+        return $this->instructors;
     }
 
-    public function addUserModel(UserModel $userModel): static
+    public function addInstructor(Instructor $instructor): static
     {
-        if (!$this->userModels->contains($userModel)) {
-            $this->userModels->add($userModel);
-            $userModel->setGrade($this);
+        if (!$this->instructors->contains($instructor)) {
+            $this->instructors->add($instructor);
+            $instructor->setGrade($this);
         }
 
         return $this;
     }
 
-    public function removeUserModel(UserModel $userModel): static
+    public function removeInstructor(Instructor $instructor): static
     {
-        if ($this->userModels->removeElement($userModel)) {
-            // set the owning side to null (unless already changed)
-            if ($userModel->getGrade() === $this) {
-                $userModel->setGrade(null);
+        if ($this->instructors->removeElement($instructor)) {
+            if ($instructor->getGrade() === $this) {
+                $instructor->setGrade(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Student>
+     */
+    public function getStudents(): Collection
+    {
+        return $this->students;
+    }
+
+    public function addStudent(Student $student): static
+    {
+        if (!$this->students->contains($student)) {
+            $this->students->add($student);
+            $student->setGrade($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStudent(Student $student): static
+    {
+        if ($this->students->removeElement($student)) {
+            if ($student->getGrade() === $this) {
+                $student->setGrade(null);
             }
         }
 

@@ -2,32 +2,32 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function Home() {
-  const [user, setUser] = useState(null);
+  const [dojang, setDojang] = useState(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchDojang = async () => {
       try {
-        const response = await axios.get('localhost:8000/api/dojangs/1', {
+        const response = await axios.get('http://localhost:8000/api/dojangs/1', {
           headers: {
-            
+            'Accept': 'application/json'
           }
         });
-        setUser(response.data);
+        setDojang(response.data);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching dojang data:', error);
       }
     };
    
-    fetchUser();
+    fetchDojang();
   }, []);
 
-  if (!user) return <div>Loading...</div>;
+  if (!dojang) return <div>Loading...</div>;
 
   return (
     <div>
-      {/* <h1>Welcome, {user.firstName} {user.lastName}</h1>
-      <p>Grade: {user.grade}</p> */}
-      <p>Dojang: {user.name}</p>
+      <h1>Dojang Information</h1>
+      <p>Name: {dojang.name}</p>
+      <p>City: {dojang.city}</p>
     </div>
   );
 }

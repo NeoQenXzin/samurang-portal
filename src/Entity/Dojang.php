@@ -7,8 +7,12 @@ use App\Repository\DojangRepository;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['dojang:read']],
+    denormalizationContext: ['groups' => ['dojang:write']]
+)]
 #[ORM\Entity(repositoryClass: DojangRepository::class)]
 class Dojang implements \Stringable
 {
@@ -17,21 +21,24 @@ class Dojang implements \Stringable
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['dojang:read', 'dojang:write'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Groups(['dojang:read', 'dojang:write'])]
     #[ORM\Column(length: 255)]
     private ?string $city = null;
 
-    /**
-     * @var Collection<int, UserModel>
-     */
-    #[ORM\OneToMany(targetEntity: UserModel::class, mappedBy: 'dojang')]
-    private Collection $samurangs;
+    #[ORM\OneToMany(targetEntity: Instructor::class, mappedBy: 'dojang')]
+    private Collection $instructors;
+
+    #[ORM\OneToMany(targetEntity: Student::class, mappedBy: 'dojang')]
+    private Collection $students;
 
     public function __construct()
     {
-        $this->samurangs = new ArrayCollection();
+        $this->instructors = new ArrayCollection();
+        $this->students = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -67,33 +74,59 @@ class Dojang implements \Stringable
         return $this;
     }
 
-    /**
-     * @return Collection<int, UserModel>
-     */
-    public function getSamurangs(): Collection
+    public function getInstructors(): Collection
     {
-        return $this->samurangs;
+        return $this->instructors;
     }
 
-    public function addSamurang(UserModel $samurang): static
+    public function addInstructor(Instructor $instructor): static
     {
-        if (!$this->samurangs->contains($samurang)) {
-            $this->samurangs->add($samurang);
-            $samurang->setDojang($this);
+        if (!$this->instructors->contains($instructor)) {
+            $this->instructors->add($instructor);
+            $instructor->setDojang($this);
         }
 
         return $this;
     }
 
-    public function removeSamurang(UserModel $samurang): static
+    public function removeInstructor(Instructor $instructor): static
     {
-        if ($this->samurangs->removeElement($samurang)) {
-            // set the owning side to null (unless already changed)
-            if ($samurang->getDojang() === $this) {
-                $samurang->setDojang(null);
+        if ($this->instructors->removeElement($instructor)) {
+            if ($instructor->getDojang() === $this) {
+                $instructor->setDojang(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Student>
+     */
+    public function getStudents(): Collection
+    {
+        return $this->students;
+    }
+
+    public function addStudent(Student $student): static
+    {
+        if (!$this->students->contains($student)) {
+            $this->students->add($student);
+            $student->setDojang($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStudent(Student $student): static
+    {
+        if ($this->students->removeElement($student)) {
+            if ($student->getDojang() === $this) {
+                $student->setDojang(null);
             }
         }
 
         return $this;
     }
 }
+
