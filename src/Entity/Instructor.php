@@ -4,12 +4,14 @@ namespace App\Entity;
 
 use App\Entity\UserModel;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\InstructorRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
+#[ApiResource]
 #[ORM\Entity(repositoryClass: InstructorRepository::class)]
 class Instructor extends UserModel implements UserInterface, PasswordAuthenticatedUserInterface
 {

@@ -22,6 +22,9 @@ services:
     depends_on:
       - app
 
+
+
+
   database:
     env_file:
       - .env.docker

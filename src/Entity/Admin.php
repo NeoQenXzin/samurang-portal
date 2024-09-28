@@ -2,11 +2,20 @@
 
 namespace App\Entity;
 
-use App\Repository\AdminRepository;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use App\Repository\AdminRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
+#[ApiResource(
+    operations: [
+        new Get(security: "is_granted('ROLE_USER') and object == user"),
+        new GetCollection(security: "is_granted('ROLE_USER')")
+    ]
+)]
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class Admin implements UserInterface, PasswordAuthenticatedUserInterface
