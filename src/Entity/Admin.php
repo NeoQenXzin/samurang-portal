@@ -10,12 +10,7 @@ use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-#[ApiResource(
-    operations: [
-        new Get(security: "is_granted('ROLE_USER') and object == user"),
-        new GetCollection(security: "is_granted('ROLE_USER')")
-    ]
-)]
+// #[ApiResource]
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class Admin implements UserInterface, PasswordAuthenticatedUserInterface

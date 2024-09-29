@@ -9,10 +9,13 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\InstructorRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read']]
+)]
 #[ORM\Entity(repositoryClass: InstructorRepository::class)]
 class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \Stringable
 {
@@ -22,40 +25,50 @@ class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \
     return $this->getFirstName() . ' ' . $this->getLastName() . ' (' . $this->getMail() . ')';
 }
 
+#[Groups(['read'])]
 #[ORM\Id]
 #[ORM\GeneratedValue]
 #[ORM\Column]
 private ?int $id = null;
 
+#[Groups(['read'])]
 #[ORM\Column(length: 70)]
 private ?string $firstname = null;
 
+#[Groups(['read'])]
 #[ORM\Column(length: 70)]
 private ?string $lastname = null;
 
+#[Groups(['read'])]
 #[ORM\Column(type: Types::DATETIME_MUTABLE)]
 private ?\DateTimeInterface $birthdate = null;
 
+#[Groups(['read'])]
 #[ORM\Column(length: 255)]
 private ?string $adress = null;
 
+#[Groups(['read'])]
 #[ORM\Column(length: 25)]
 private ?string $sexe = null;
 
+#[Groups(['read'])]
 #[ORM\Column(length: 25, nullable: true)]
 private ?string $tel = null;
 
+#[Groups(['read'])]
 #[ORM\Column(length: 70)]
 private ?string $mail = null;
 
-
+#[Groups(['read'])]
 #[ORM\Column(length: 25, nullable: true)]
 private ?string $passport = null;
 
+#[Groups(['read'])]
 #[ORM\ManyToOne(inversedBy: 'instructors')]
 #[ORM\JoinColumn(nullable: false)]
 private ?Grade $grade = null;
 
+#[Groups(['read'])]
 #[ORM\ManyToOne(inversedBy: 'instructors')]
 private ?Dojang $dojang = null;
 
@@ -186,6 +199,7 @@ public function setDojang(?Dojang $dojang): static
     /**
      * @var Collection<int, Student>
      */
+    #[Groups(['read'])]
     #[ORM\OneToMany(targetEntity: Student::class, mappedBy: 'instructor')]
     private Collection $students;
 

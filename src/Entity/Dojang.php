@@ -2,16 +2,17 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\DojangRepository;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    normalizationContext: ['groups' => ['dojang:read']],
-    denormalizationContext: ['groups' => ['dojang:write']]
+    normalizationContext: ['groups' => ['read']]
 )]
 #[ORM\Entity(repositoryClass: DojangRepository::class)]
 class Dojang implements \Stringable
@@ -21,11 +22,11 @@ class Dojang implements \Stringable
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['dojang:read', 'dojang:write'])]
+    #[Groups(['read'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[Groups(['dojang:read', 'dojang:write'])]
+    #[Groups(['read'])]
     #[ORM\Column(length: 255)]
     private ?string $city = null;
 
