@@ -1,0 +1,16 @@
+{# templates/home/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Bienvenue sur Samurang Portal</h1>
+    <p>Veuillez vous identifier :</p>
+    <form action="{{ path('app_login') }}" method="post">
+        <label for="username">Email:</label>
+        <input type="text" id="username" name="_username">
+
+        <label for="password">Mot de passe:</label>
+        <input type="password" id="password" name="_password">
+
+        <button type="submit">Se connecter</button>
+    </form>
+{% endblock %}
