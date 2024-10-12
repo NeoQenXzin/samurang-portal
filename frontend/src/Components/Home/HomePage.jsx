@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+axios.defaults.withCredentials = true;
+
 function HomePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -8,8 +10,15 @@ function HomePage() {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      let token = localStorage.getItem('token');
       const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
+      const urlToken = urlParams.get('token');
+      
+      if (urlToken) {
+        token = urlToken;
+        localStorage.setItem('token', token);
+        window.history.replaceState({}, document.title, "/home");
+      }
       
       if (!token) {
         setError('Aucun token trouvé');
@@ -26,13 +35,28 @@ function HomePage() {
         setUser(response.data);
         setLoading(false);
       } catch (err) {
-        setError('Erreur lors du chargement des données ');
+        setError('Erreur lors du chargement des données');
         setLoading(false);
       }
     };
 
     fetchUserData();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:8000/logout', null, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      localStorage.removeItem('token');
+      window.location.href = 'http://localhost:8000/login';
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion', error);
+    }
+  };
 
   if (loading) return <div>Chargement...</div>;
   if (error) return <div>{error}</div>;
@@ -48,6 +72,7 @@ function HomePage() {
       {user.roles.includes('ROLE_INSTRUCTOR') && (
         <p>Nombre d'élèves : {user.students?.length}</p>
       )}
+      <button onClick={handleLogout}>Se déconnecter</button>
     </div>
   );
 }

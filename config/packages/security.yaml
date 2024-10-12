@@ -47,6 +47,11 @@ security:
                 enable_csrf: true
             logout:
                 path: app_logout
+                target: app_login
+                invalidate_session: true
+                delete_cookies:
+                    PHPSESSID: { path: null, domain: null, secure: true, samesite: 'strict' }
+                    jwt_token: { path: null, domain: null, secure: true, samesite: 'strict' }
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
@@ -57,6 +62,8 @@ security:
         - { path: ^/api/contexts, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/logout, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
