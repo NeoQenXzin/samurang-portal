@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Grade;
 use App\Entity\Dojang;
 use App\Entity\Student;
+use App\Entity\NextOrder;
 use App\Entity\Instructor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -46,6 +47,7 @@ class DashboardController extends AbstractDashboardController
             'homepage'
         );
         yield MenuItem::linkToDashboard('Dashboard', 'fas fa-meteor');
+        yield MenuItem::linkToCrud('Next Order', 'fas fa-shopping-cart', NextOrder::class);
         yield MenuItem::linkToCrud(
             'Dojang',
             'fas fa-vihara',
