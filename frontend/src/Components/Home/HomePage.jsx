@@ -105,7 +105,7 @@ function HomePage() {
       <p>Dojang : {user.dojang?.name}</p>
       <p>Grade : {user.grade?.name}</p>
       {user.roles.includes("ROLE_INSTRUCTOR") && (
-        <p>Nombre d'élèves : {user.students?.length}</p>
+        <p>Nombre d'élèves : {user.studentsCount}</p>
       )}
       <div>
         <h2>Prochaine date de commande</h2>

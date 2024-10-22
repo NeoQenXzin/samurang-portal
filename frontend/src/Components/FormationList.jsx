@@ -41,44 +41,69 @@ function FormationsList() {
     }
   };
 
-  const handleToggleParticipation = async (formationId) => {
-    let isParticipating = null
-    try {
-      const formation = formations.find(f => f.id === formationId);
-      if (!formation) {
-        throw new Error('Formation non trouvée');
-      }
-      isParticipating = await isUserParticipating(formation);
-      const endpoint = isParticipating ? 'unregister' : 'register';
-      
-      await axios.post(`http://localhost:8000/api/formations/${formationId}/${endpoint}`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      
-      // Mettre à jour la formation localement
-      const updatedFormations = formations.map(f => {
-        if (f.id === formationId) {
-          const updatedParticipants = isParticipating
-            ? (f.instructorParticipants || []).filter(p => p.id !== user?.id)
-            : [...(f.instructorParticipants || []), { id: user?.id, firstname: user?.firstname, lastname: user?.lastname }];
-          return { ...f, 
-            instructorParticipants: updatedParticipants,
-            participantsCount: isParticipating ? f.participantsCount - 1 : f.participantsCount + 1};
-        }
-        return f;
-      });
-      
-      setFormations(updatedFormations);
-    } catch (err) {
-      setError(`Erreur lors de ${isParticipating ? 'la désinscription' : 'l\'inscription'}: ${err.message}`);
-    }
-  };
+  // Ajouter une fonction pour vérifier si l'utilisateur est un instructeur
+const isInstructor = () => {
+  return user?.roles?.includes('ROLE_INSTRUCTOR');
+};
 
-  const isUserParticipating = (formation) => {
+// Modifier la fonction isUserParticipating
+const isUserParticipating = (formation) => {
+  if (isInstructor()) {
     return formation.instructorParticipants && 
            Array.isArray(formation.instructorParticipants) &&
            formation.instructorParticipants.some(p => p.id === user?.id);
-  };
+  } else {
+    return formation.studentParticipants && 
+           Array.isArray(formation.studentParticipants) &&
+           formation.studentParticipants.some(p => p.id === user?.id);
+  }
+};
+
+// Modifier la fonction handleToggleParticipation pour gérer les deux types de participants
+const handleToggleParticipation = async (formationId) => {
+  let isParticipating = null;
+  try {
+    const formation = formations.find(f => f.id === formationId);
+    if (!formation) {
+      throw new Error('Formation non trouvée');
+    }
+    isParticipating = await isUserParticipating(formation);
+    const endpoint = isParticipating ? 'unregister' : 'register';
+    
+    await axios.post(`http://localhost:8000/api/formations/${formationId}/${endpoint}`, {}, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    
+    const updatedFormations = formations.map(f => {
+      if (f.id === formationId) {
+        if (isInstructor()) {
+          const updatedInstructorParticipants = isParticipating
+            ? (f.instructorParticipants || []).filter(p => p.id !== user?.id)
+            : [...(f.instructorParticipants || []), { id: user?.id, firstname: user?.firstname, lastname: user?.lastname }];
+          return { 
+            ...f, 
+            instructorParticipants: updatedInstructorParticipants,
+            participantsCount: isParticipating ? f.participantsCount - 1 : f.participantsCount + 1
+          };
+        } else {
+          const updatedStudentParticipants = isParticipating
+            ? (f.studentParticipants || []).filter(p => p.id !== user?.id)
+            : [...(f.studentParticipants || []), { id: user?.id, firstname: user?.firstname, lastname: user?.lastname }];
+          return { 
+            ...f, 
+            studentParticipants: updatedStudentParticipants,
+            participantsCount: isParticipating ? f.participantsCount - 1 : f.participantsCount + 1
+          };
+        }
+      }
+      return f;
+    });
+    
+    setFormations(updatedFormations);
+  } catch (err) {
+    setError(`Erreur lors de ${isParticipating ? 'la désinscription' : 'l\'inscription'}: ${err.message}`);
+  }
+};
 
   if (loading) return <div>Chargement...</div>;
   if (error) return <div>{error}</div>;
