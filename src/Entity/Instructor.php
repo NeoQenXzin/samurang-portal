@@ -14,7 +14,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ApiResource(
-    normalizationContext: ['groups' => ['read']]
+    normalizationContext: ['groups' => ['instructor:read']],
+    denormalizationContext: ['groups' => ['instructor:write']]
 )]
 #[ORM\Entity(repositoryClass: InstructorRepository::class)]
 class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \Stringable
@@ -25,50 +26,50 @@ class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \
     return $this->getFirstName() . ' ' . $this->getLastName() . ' (' . $this->getMail() . ')';
 }
 
-#[Groups(['read'])]
 #[ORM\Id]
 #[ORM\GeneratedValue]
 #[ORM\Column]
+#[Groups(['instructor:write', 'formation:read'])]
 private ?int $id = null;
 
-#[Groups(['read'])]
 #[ORM\Column(length: 70)]
+#[Groups(['instructor:read', 'instructor:write', 'formation:read'])]
 private ?string $firstname = null;
 
-#[Groups(['read'])]
 #[ORM\Column(length: 70)]
+#[Groups(['instructor:read', 'instructor:write', 'formation:read'])]
 private ?string $lastname = null;
 
-#[Groups(['read'])]
+ #[Groups(['instructor:read', 'instructor:write'])]
 #[ORM\Column(type: Types::DATETIME_MUTABLE)]
 private ?\DateTimeInterface $birthdate = null;
 
-#[Groups(['read'])]
+ #[Groups(['instructor:read', 'instructor:write'])]
 #[ORM\Column(length: 255)]
 private ?string $adress = null;
 
-#[Groups(['read'])]
+ #[Groups(['instructor:read', 'instructor:write'])]
 #[ORM\Column(length: 25)]
 private ?string $sexe = null;
 
-#[Groups(['read'])]
+ #[Groups(['instructor:read', 'instructor:write'])]
 #[ORM\Column(length: 25, nullable: true)]
 private ?string $tel = null;
 
-#[Groups(['read'])]
+ #[Groups(['instructor:read', 'instructor:write'])]
 #[ORM\Column(length: 70)]
 private ?string $mail = null;
 
-#[Groups(['read'])]
+#[Groups(['instructor:read', 'instructor:write'])]
 #[ORM\Column(length: 25, nullable: true)]
 private ?string $passport = null;
 
-#[Groups(['read'])]
+#[Groups(['instructor:read', 'instructor:write'])]
 #[ORM\ManyToOne(inversedBy: 'instructors')]
 #[ORM\JoinColumn(nullable: false)]
 private ?Grade $grade = null;
 
-#[Groups(['read'])]
+#[Groups(['instructor:read', 'instructor:write'])]
 #[ORM\ManyToOne(inversedBy: 'instructors')]
 private ?Dojang $dojang = null;
 
@@ -199,13 +200,15 @@ public function setDojang(?Dojang $dojang): static
     /**
      * @var Collection<int, Student>
      */
-    #[Groups(['read'])]
+    #[Groups(['instructor:read'])]
     #[ORM\OneToMany(targetEntity: Student::class, mappedBy: 'instructor')]
     private Collection $students;
 
     public function __construct()
     {
         $this->students = new ArrayCollection();
+        $this->organizedFormations = new ArrayCollection();
+        $this->participatedFormations = new ArrayCollection();
     }
 
     /**
@@ -250,6 +253,20 @@ public function setDojang(?Dojang $dojang): static
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, Formation>
+     */
+    #[Groups(['instructor:read'])]
+    #[ORM\OneToMany(targetEntity: Formation::class, mappedBy: 'organizer')]
+    private Collection $organizedFormations;
+
+    /**
+     * @var Collection<int, Formation>
+     */
+    #[Groups(['instructor:read'])]
+    #[ORM\ManyToMany(targetEntity: Formation::class, mappedBy: 'instructorParticipants')]
+    private Collection $participatedFormations;
 
  
 
@@ -308,5 +325,62 @@ public function setDojang(?Dojang $dojang): static
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Formation>
+     */
+    public function getOrganizedFormations(): Collection
+    {
+        return $this->organizedFormations;
+    }
+
+    public function addOrganizedFormation(Formation $organizedFormation): static
+    {
+        if (!$this->organizedFormations->contains($organizedFormation)) {
+            $this->organizedFormations->add($organizedFormation);
+            $organizedFormation->setOrganizer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganizedFormation(Formation $organizedFormation): static
+    {
+        if ($this->organizedFormations->removeElement($organizedFormation)) {
+            // set the owning side to null (unless already changed)
+            if ($organizedFormation->getOrganizer() === $this) {
+                $organizedFormation->setOrganizer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Formation>
+     */
+    public function getParticipatedFormations(): Collection
+    {
+        return $this->participatedFormations;
+    }
+
+    public function addParticipatedFormation(Formation $participatedFormation): static
+    {
+        if (!$this->participatedFormations->contains($participatedFormation)) {
+            $this->participatedFormations->add($participatedFormation);
+            $participatedFormation->addInstructorParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParticipatedFormation(Formation $participatedFormation): static
+    {
+        if ($this->participatedFormations->removeElement($participatedFormation)) {
+            $participatedFormation->removeInstructorParticipant($this);
+        }
+
+        return $this;
     }
 }

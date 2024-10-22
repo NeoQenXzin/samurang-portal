@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Grade;
 use App\Entity\Dojang;
 use App\Entity\Student;
+use App\Entity\Formation;
 use App\Entity\NextOrder;
 use App\Entity\Instructor;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,6 +69,7 @@ class DashboardController extends AbstractDashboardController
             'fab fa-studiovinari',
             Instructor::class
         );
+        yield MenuItem::linkToCrud('Formations', 'fas fa-graduation-cap', Formation::class);
     }
 
     // public function configureUserMenu(UserInterface $user): UserMenu

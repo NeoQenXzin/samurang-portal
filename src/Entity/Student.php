@@ -5,12 +5,18 @@ namespace App\Entity;
 use Stringable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\StudentRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['student:read']],
+    denormalizationContext: ['groups' => ['student:write']]
+)]
 #[ORM\Entity(repositoryClass: StudentRepository::class)]
 class Student implements UserInterface, PasswordAuthenticatedUserInterface, \Stringable 
 {
@@ -23,38 +29,49 @@ class Student implements UserInterface, PasswordAuthenticatedUserInterface, \Str
         #[ORM\Id]
         #[ORM\GeneratedValue]
         #[ORM\Column]
+        #[Groups(['student:read', 'formation:read'])]
         private ?int $id = null;
     
         #[ORM\Column(length: 70)]
+        #[Groups(['student:read', 'student:write', 'formation:read'])]
         private ?string $firstname = null;
     
         #[ORM\Column(length: 70)]
+        #[Groups(['student:read', 'student:write', 'formation:read'])]
         private ?string $lastname = null;
     
         #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+        #[Groups(['student:read', 'student:write'])]
         private ?\DateTimeInterface $birthdate = null;
     
         #[ORM\Column(length: 255)]
+        #[Groups(['student:read', 'student:write'])]
         private ?string $adress = null;
     
         #[ORM\Column(length: 25)]
+        #[Groups(['student:read', 'student:write'])]
         private ?string $sexe = null;
     
         #[ORM\Column(length: 25, nullable: true)]
+        #[Groups(['student:read', 'student:write'])]
         private ?string $tel = null;
     
         #[ORM\Column(length: 70)]
+        #[Groups(['student:read', 'student:write'])]
         private ?string $mail = null;
     
     
         #[ORM\Column(length: 25, nullable: true)]
+        #[Groups(['student:read', 'student:write'])]
         private ?string $passport = null;
     
         #[ORM\ManyToOne(inversedBy: 'students')]
         #[ORM\JoinColumn(nullable: false)]
+        #[Groups(['student:read', 'student:write'])]
         private ?Grade $grade = null;
     
         #[ORM\ManyToOne(inversedBy: 'students')]
+        #[Groups(['student:read', 'student:write'])]
         private ?Dojang $dojang = null;
     
         public function getId(): ?int
@@ -182,6 +199,7 @@ class Student implements UserInterface, PasswordAuthenticatedUserInterface, \Str
             return $this;
         }
     #[ORM\ManyToOne(inversedBy: 'students')]
+    #[Groups(['student:read', 'student:write'])]
     private ?Instructor $instructor = null;
 
     public function getInstructor(): ?Instructor
@@ -207,6 +225,19 @@ class Student implements UserInterface, PasswordAuthenticatedUserInterface, \Str
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, Formation>
+     */
+    #[Groups(['student:read'])]
+    #[ORM\ManyToMany(targetEntity: Formation::class, mappedBy: 'studentParticipants')]
+    
+    private Collection $participatedFormations;
+
+    public function __construct()
+    {
+        $this->participatedFormations = new ArrayCollection();
+    }
 
  
 
@@ -265,5 +296,32 @@ class Student implements UserInterface, PasswordAuthenticatedUserInterface, \Str
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Formation>
+     */
+    public function getParticipatedFormations(): Collection
+    {
+        return $this->participatedFormations;
+    }
+
+    public function addParticipatedFormation(Formation $participatedFormation): static
+    {
+        if (!$this->participatedFormations->contains($participatedFormation)) {
+            $this->participatedFormations->add($participatedFormation);
+            $participatedFormation->addStudentParticipant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParticipatedFormation(Formation $participatedFormation): static
+    {
+        if ($this->participatedFormations->removeElement($participatedFormation)) {
+            $participatedFormation->removeStudentParticipant($this);
+        }
+
+        return $this;
     }
 }
