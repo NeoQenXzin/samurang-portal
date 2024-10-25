@@ -38,5 +38,23 @@ services:
     ports:
       - "5432:5432"
 
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.react
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - app
+    stdin_open: true
+    tty: true
+
+
 volumes:
   database_data:

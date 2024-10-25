@@ -30,3 +30,9 @@ Makefile
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+
+### Backups
+/Backups
+
+### react
+/frontend/.react-pid
