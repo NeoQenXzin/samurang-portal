@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
 
 function HomePage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [nextOrder, setNextOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -70,18 +72,40 @@ function HomePage() {
     fetchUserData();
   }, []);
 
+  // symfony logout
+  // const handleLogout = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     await axios.post("http://localhost:8000/logout", null, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     localStorage.removeItem("token");
+  //     window.location.href = "http://localhost:8000/login";
+  //   } catch (error) {
+  //     console.error("Erreur lors de la déconnexion", error);
+  //   }
+  // };
+
+  // react logout
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:8000/logout", null, {
+      // Supprimez le token du localStorage avant la requête
+      localStorage.removeItem("token");
+      // Utilisez la route API Platform pour la déconnexion
+      await axios.post("http://localhost:8000/api/logout", null, {
         headers: {
           Authorization: `Bearer ${token}`,
-        },
+        }
       });
-      localStorage.removeItem("token");
-      window.location.href = "http://localhost:8000/login";
+      // Redirigez vers la page de login
+      window.location.href = "http://localhost:3000";
     } catch (error) {
       console.error("Erreur lors de la déconnexion", error);
+      // En cas d'erreur, redirigez quand même vers la page de login
+      window.location.href = "http://localhost:3000";
     }
   };
 
