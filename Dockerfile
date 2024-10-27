@@ -14,6 +14,14 @@ WORKDIR /var/www
 
 COPY . .
 
+# Créer le dossier var et définir les permissions
+RUN mkdir -p var/cache var/log \
+    && composer install --no-scripts --no-autoloader \
+    && composer dump-autoload --optimize \
+    && chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/var
+
+
 RUN composer install --no-scripts --no-autoloader
 RUN composer dump-autoload --optimize
 # Install Symfony CLI

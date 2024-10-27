@@ -19,7 +19,7 @@ class SecurityController extends AbstractController
     {
 
         if ($this->getUser()) {
-            // $token = $jwtManager->create($this->getUser());
+            $token = $jwtManager->create($this->getUser());
             // return $this->redirect('http://localhost:3000/home?token=' . $token);
             return $this->redirect('http://localhost:8000/mydojang');
         }
