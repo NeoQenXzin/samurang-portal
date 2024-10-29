@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
@@ -11,10 +11,15 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  const FRONT_URL = process.env.REACT_APP_FRONT_URL || "http://localhost:3000";
+
+  // Remplacez toutes les occurrences de 'http://localhost:8000' par `${API_URL}`
+  // et 'http://localhost:3000' par `${FRONT_URL}`
   const fetchNextOrderData = async (token) => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/next_orders",
+        `${API_URL}/api/next_orders`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,7 +58,7 @@ function HomePage() {
 
       try {
         const userResponse = await axios.get(
-          "http://localhost:8000/api/current_user",
+          `${API_URL}/api/current_user`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -95,17 +100,17 @@ function HomePage() {
       // Supprimez le token du localStorage avant la requête
       localStorage.removeItem("token");
       // Utilisez la route API Platform pour la déconnexion
-      await axios.post("http://localhost:8000/api/logout", null, {
+      await axios.post(`${API_URL}/api/logout`, null, {
         headers: {
           Authorization: `Bearer ${token}`,
-        }
+        },
       });
       // Redirigez vers la page de login
-      window.location.href = "http://localhost:3000";
+      window.location.href = FRONT_URL;
     } catch (error) {
       console.error("Erreur lors de la déconnexion", error);
       // En cas d'erreur, redirigez quand même vers la page de login
-      window.location.href = "http://localhost:3000";
+      window.location.href = FRONT_URL;
     }
   };
 

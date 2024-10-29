@@ -7,6 +7,9 @@ function FormationsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   useEffect(() => {
     fetchFormations();
     fetchCurrentUser();
@@ -14,7 +17,7 @@ function FormationsList() {
 
   const fetchFormations = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/formations', {
+      const response = await axios.get(`${API_URL}/api/formations`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       if (response.data.member && response.data.member.length > 0) {
@@ -32,7 +35,7 @@ function FormationsList() {
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/current_user', {
+      const response = await axios.get(`${API_URL}/api/current_user`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setUser(response.data);
@@ -70,7 +73,7 @@ const handleToggleParticipation = async (formationId) => {
     isParticipating = await isUserParticipating(formation);
     const endpoint = isParticipating ? 'unregister' : 'register';
     
-    await axios.post(`http://localhost:8000/api/formations/${formationId}/${endpoint}`, {}, {
+    await axios.post(`${API_URL}/api/formations/${formationId}/${endpoint}`, {}, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     
