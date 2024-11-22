@@ -4,7 +4,10 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+# Installez les dépendances, y compris Tailwind
+RUN npm install && \
+    npm install -D tailwindcss postcss autoprefixer && \
+    npx tailwindcss init -p
 
 COPY . .
 

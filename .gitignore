@@ -27,6 +27,7 @@
 
 #Makefile
 Makefile
+Makefile.vps
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
@@ -38,4 +39,4 @@ Makefile
 /frontend/.react-pid
 
 ### Bruno
-/samurang-portal/
+# /samurang-portal/
