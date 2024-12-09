@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 import HomePage from './Components/Home/HomePage';
 import Events from './Components/FormationList';
 import Training from './Components/Training/Training';
@@ -11,7 +13,9 @@ import calendar from './assets/icones/calendar.png'
 import symbol from './assets/icones/symbol.png'
 import dummy from './assets/icones/dummy.png'
 
+
 function App() {
+
   const isAuthenticated = () => {
     return !!localStorage.getItem('token');
   };
@@ -39,44 +43,46 @@ function App() {
   };
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={!isAuthenticated() ? <Login /> : <Navigate to="/home" />} />
-        <Route
-          path="/home"
-          element={
-            <PrivateRoute>
-              <HomePage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/events"
-          element={
-            <PrivateRoute>
-              <Events />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/training"
-          element={
-            <PrivateRoute>
-              <Training />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/profil"
-          element={
-            <PrivateRoute>
-              <Profil />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/logout" element={<Logout />} />
-      </Routes>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        <Routes>
+          <Route path="/" element={!isAuthenticated() ? <Login /> : <Navigate to="/home" />} />
+          <Route
+            path="/home"
+            element={
+              <PrivateRoute>
+                <HomePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/events"
+            element={
+              <PrivateRoute>
+                <Events />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/training"
+            element={
+              <PrivateRoute>
+                <Training />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profil"
+            element={
+              <PrivateRoute>
+                <Profil />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/logout" element={<Logout />} />
+        </Routes>
+      </Router>
+    </Provider>
   );
 }
 
