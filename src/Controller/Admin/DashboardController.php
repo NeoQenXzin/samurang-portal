@@ -29,7 +29,6 @@ class DashboardController extends AbstractDashboardController
         $url = $routeBuilder->setController(InstructorCrudController::class)->generateUrl();
 
         return $this->redirect($url);
-    
     }
 
     public function configureDashboard(): Dashboard
@@ -37,18 +36,12 @@ class DashboardController extends AbstractDashboardController
         return Dashboard::new()
             ->setTitle('Samurang Portal');
     }
-    
+
 
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linktoRoute(
-            'Back to the website',
-            'fas fa-home',
-            'homepage'
-        );
         yield MenuItem::linkToDashboard('Dashboard', 'fas fa-meteor');
-        yield MenuItem::linkToCrud('Next Order', 'fas fa-shopping-cart', NextOrder::class);
         yield MenuItem::linkToCrud(
             'Dojang',
             'fas fa-vihara',
@@ -70,6 +63,13 @@ class DashboardController extends AbstractDashboardController
             Instructor::class
         );
         yield MenuItem::linkToCrud('Formations', 'fas fa-graduation-cap', Formation::class);
+        yield MenuItem::linkToCrud('Next Order', 'fas fa-shopping-cart', NextOrder::class);
+        yield MenuItem::linktoRoute(
+            'Back to the website',
+            'fas fa-home',
+            'homepage'
+              // 'process.env.REACT_APP_site_URL || "http://localhost:3000";'
+        );
     }
 
     // public function configureUserMenu(UserInterface $user): UserMenu

@@ -13,16 +13,22 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class SecurityController extends AbstractController
 {
-    // Pour login symfony 
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils, JWTTokenManagerInterface $jwtManager): Response
     {
-
         if ($this->getUser()) {
             $token = $jwtManager->create($this->getUser());
-            // return $this->redirect('http://localhost:3000/home?token=' . $token);
-            return $this->redirect('http://localhost:8000/mydojang');
+
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('admin', ['token' => $token]);
+            } elseif ($this->isGranted('ROLE_INSTRUCTOR')) {
+                return $this->redirectToRoute('instructor_dashboard', ['token' => $token]);
+            }
+
+            // Redirection par défaut si l'utilisateur n'a ni le rôle admin ni instructeur
+            return $this->redirectToRoute('app_home', ['token' => $token]);
         }
+
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
 
@@ -54,7 +60,7 @@ class SecurityController extends AbstractController
         return new JsonResponse(['message' => 'Déconnexion réussie']);
     }
 
-    
+
     #[Route(path: '/logout', name: 'app_logout', methods: ['GET', 'POST'])]
     public function logout(): void
     {

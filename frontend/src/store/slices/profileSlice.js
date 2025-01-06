@@ -9,29 +9,36 @@ export const fetchUserProfile = createAsyncThunk(
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        return rejectWithValue('Veuillez vous connecter pour accéder à votre profil');
+        throw new Error('Token non trouvé');
       }
 
-      const headers = { Authorization: `Bearer ${token}` };
-      const endpoints = {
-        user: `${API_URL}/api/current_user`,
-        events: `${API_URL}/api/formations`,
-        orders: `${API_URL}/api/next_orders`,
-      };
+      const userResponse = await axios.get(`${API_URL}/api/current_user`);
 
-      const [userResponse, eventsResponse, orderResponse] = await Promise.all([
-        axios.get(endpoints.user, { headers }),
-        axios.get(endpoints.events, { headers }),
-        axios.get(endpoints.orders, { headers }),
-      ]);
+      // provisoire Only fetch students if user is an instructor
+      let students = [];
+      if (userResponse.data.roles.includes('ROLE_INSTRUCTOR')) {
+        try {
+          const studentsResponse = await axios.get(`${API_URL}/api/students`);
+          students = studentsResponse.data.member || [];
+        } catch (error) {
+          console.warn('Erreur lors du chargement des étudiants:', error);
+          //provisoire  Continue without students data if there's an error
+        }
+      }
 
       return {
-        user: userResponse.data,
-        events: eventsResponse.data["hydra:member"],
-        nextOrder: orderResponse.data,
+        user: {
+          ...userResponse.data,
+          dojang: userResponse.data.dojang || null,
+          grade: userResponse.data.grade || null,
+        },
+        students,
       };
     } catch (error) {
-      return rejectWithValue('Erreur lors du chargement de vos données');
+      if (error.response?.status === 500) {
+        return rejectWithValue('Erreur serveur. Veuillez réessayer plus tard.');
+      }
+      return rejectWithValue(error.message || 'Erreur lors du chargement des données');
     }
   }
 );
@@ -43,7 +50,13 @@ const profileSlice = createSlice({
     isLoading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearProfile: (state) => {
+      state.userData = null;
+      state.error = null;
+      state.isLoading = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserProfile.pending, (state) => {
@@ -58,8 +71,13 @@ const profileSlice = createSlice({
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+        // If we get a 401 or 403, we should redirect to login
+        if (action.payload === 'Token non trouvé') {
+          localStorage.removeItem('token');
+        }
       });
   },
 });
 
+export const { clearProfile } = profileSlice.actions;
 export default profileSlice.reducer;

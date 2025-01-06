@@ -5,13 +5,21 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './store/store';
+import './utils/axiosConfig';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <ToastContainer position="top-right" autoClose={5000} />
-    <App />
-  </React.StrictMode>
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <React.StrictMode>
+        <ToastContainer position="top-right" autoClose={5000} />
+        <App />
+      </React.StrictMode>
+    </PersistGate>
+  </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

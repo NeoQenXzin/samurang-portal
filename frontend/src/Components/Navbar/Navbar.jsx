@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+
+import { useDispatch } from 'react-redux';
+import { clearToken } from '../../store/slices/authSlice';
+import { clearProfile } from '../../store/slices/profileSlice';
+
 import "./Navbar.css";
 
 // Import your icons
@@ -31,10 +36,19 @@ const Navbar = ({ li }) => {
       window.removeEventListener("resize", handleResize);
     };
   }, [location]);
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/", { replace: true });
+    const token = localStorage.getItem('token');
+    if (token) {
+      localStorage.removeItem('token');
+      dispatch(clearToken());
+      dispatch(clearProfile());
+      console.log("Déconnexion réussie");
+    } else {
+      console.log("Aucun token trouvé, l'utilisateur est déjà déconnecté");
+    }
+    navigate('/', { replace: true });
   };
 
   const toggleMenu = () => {

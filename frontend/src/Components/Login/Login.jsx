@@ -4,14 +4,45 @@ import { useNavigate } from "react-router-dom";
 import backgroundImage from "../../assets/images/Haidong-1.jpg";
 import logoFrance from "../../assets/icones/logo-france.png";
 
+// function Login() {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [error, setError] = useState(null);
+//   const navigate = useNavigate();
+
+//   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     try {
+//       const response = await axios.post(`${API_URL}/api/login_check`, {
+//         username: email,
+//         password: password,
+//       });
+
+//       if (response.data.token) {
+//         localStorage.setItem("token", response.data.token);
+//         navigate("/dashboard");
+//       }
+//     } catch (err) {
+//       setError("Email ou mot de passe incorrect");
+//       console.error("Erreur de connexion:", err);
+//     }
+//   };
+
+import { useDispatch } from 'react-redux';
+import { setToken } from '../../store/slices/authSlice';
+
 function Login() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
-
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+  
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  
+  const dispatch = useDispatch();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -21,15 +52,14 @@ function Login() {
       });
 
       if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        navigate("/home");
+        dispatch(setToken(response.data.token));
+        navigate("/dashboard");
       }
     } catch (err) {
       setError("Email ou mot de passe incorrect");
       console.error("Erreur de connexion:", err);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center  justify-center relative m-0 p-0">
       {/* Background Image */}

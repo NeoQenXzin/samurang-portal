@@ -1,182 +1,173 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEvents, toggleEventParticipation } from "../store/slices/eventsSlice";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 function FormationsList() {
-  const [formations, setFormations] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  const dispatch = useDispatch();
+  const { events, loading, error } = useSelector((state) => state.events);
+  const { userData } = useSelector((state) => state.profile);
+  const [expandedEvents, setExpandedEvents] = useState({});
 
   useEffect(() => {
-    fetchFormations();
-    fetchCurrentUser();
-  }, []);
+    dispatch(fetchEvents());
+  }, [dispatch]);
 
-  const fetchFormations = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/formations`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      if (response.data.member && response.data.member.length > 0) {
-        setFormations(response.data.member);
-        console.log("formations", response.data.member[0]);
-      } else {
-        console.log("Aucune donnée de formation trouvée");
-      }
-    } catch (err) {
-      setError("Erreur lors du chargement des formations");
-    } finally {
-      setLoading(false);
-    }
+  const toggleEventExpansion = (eventId) => {
+    setExpandedEvents(prev => ({
+      ...prev,
+      [eventId]: !prev[eventId]
+    }));
   };
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/current_user`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      setUser(response.data);
-    } catch (err) {
-      setError("Erreur lors du chargement des données utilisateur");
-    }
-  };
-
-  // Ajouter une fonction pour vérifier si l'utilisateur est un instructeur
-  const isInstructor = () => {
-    return user?.roles?.includes("ROLE_INSTRUCTOR");
-  };
-
-  // Modifier la fonction isUserParticipating
   const isUserParticipating = (formation) => {
-    if (isInstructor()) {
-      return (
-        formation.instructorParticipants &&
-        Array.isArray(formation.instructorParticipants) &&
-        formation.instructorParticipants.some((p) => p.id === user?.id)
-      );
-    } else {
-      return (
-        formation.studentParticipants &&
-        Array.isArray(formation.studentParticipants) &&
-        formation.studentParticipants.some((p) => p.id === user?.id)
-      );
+    if (!userData?.user) return false;
+    
+    if (userData.user.roles.includes("ROLE_INSTRUCTOR")) {
+      return formation.instructorParticipants?.some(p => p.id === userData.user.id);
     }
+    return formation.studentParticipants?.some(p => p.id === userData.user.id);
   };
 
-  // Modifier la fonction handleToggleParticipation pour gérer les deux types de participants
   const handleToggleParticipation = async (formationId) => {
-    let isParticipating = null;
-    try {
-      const formation = formations.find((f) => f.id === formationId);
-      if (!formation) {
-        throw new Error("Formation non trouvée");
-      }
-      isParticipating = await isUserParticipating(formation);
-      const endpoint = isParticipating ? "unregister" : "register";
-
-      await axios.post(
-        `${API_URL}/api/formations/${formationId}/${endpoint}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-
-      const updatedFormations = formations.map((f) => {
-        if (f.id === formationId) {
-          if (isInstructor()) {
-            const updatedInstructorParticipants = isParticipating
-              ? (f.instructorParticipants || []).filter(
-                  (p) => p.id !== user?.id
-                )
-              : [
-                  ...(f.instructorParticipants || []),
-                  {
-                    id: user?.id,
-                    firstname: user?.firstname,
-                    lastname: user?.lastname,
-                  },
-                ];
-            return {
-              ...f,
-              instructorParticipants: updatedInstructorParticipants,
-              participantsCount: isParticipating
-                ? f.participantsCount - 1
-                : f.participantsCount + 1,
-            };
-          } else {
-            const updatedStudentParticipants = isParticipating
-              ? (f.studentParticipants || []).filter((p) => p.id !== user?.id)
-              : [
-                  ...(f.studentParticipants || []),
-                  {
-                    id: user?.id,
-                    firstname: user?.firstname,
-                    lastname: user?.lastname,
-                  },
-                ];
-            return {
-              ...f,
-              studentParticipants: updatedStudentParticipants,
-              participantsCount: isParticipating
-                ? f.participantsCount - 1
-                : f.participantsCount + 1,
-            };
-          }
-        }
-        return f;
-      });
-
-      setFormations(updatedFormations);
-    } catch (err) {
-      setError(
-        `Erreur lors de ${
-          isParticipating ? "la désinscription" : "l'inscription"
-        }: ${err.message}`
-      );
-    }
+    const isParticipating = isUserParticipating(events.find(e => e.id === formationId));
+    await dispatch(toggleEventParticipation({ formationId, isParticipating }));
   };
 
-  if (loading) return <div>Chargement...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 mt-4 p-4">
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h1 className="bg-red-300">Liste des Formations</h1>
-      {formations.map((formation) => (
-        <div key={formation.id}>
-          <h2>{formation.type}</h2>
-          <p>
-            Date: {new Date(formation.startDate).toLocaleDateString()} -{" "}
-            {new Date(formation.endDate).toLocaleDateString()}
-          </p>
-          <p>Lieu: {formation.location}</p>
-          <p>Nombre de participants: {formation.participantsCount || 0}</p>
-          {isUserParticipating(formation) && (
-            <p>Vous participez à cet événement</p>
-          )}
-          <button onClick={() => handleToggleParticipation(formation.id)}>
-            {isUserParticipating(formation) ? "Se désinscrire" : "S'inscrire"}
-          </button>
-          <h3>Participants:</h3>
-          <ul>
-            {formation.instructorParticipants &&
-              formation.instructorParticipants.map((instructor) => (
-                <li key={instructor.id}>
-                  {instructor.firstname} {instructor.lastname} (Instructeur)
-                </li>
-              ))}
-            {formation.studentParticipants &&
-              formation.studentParticipants.map((student) => (
-                <li key={student.id}>
-                  {student.firstname} {student.lastname} (Étudiant)
-                </li>
-              ))}
-          </ul>
+    <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Événements à venir
+        </h1>
+        
+        <div className="space-y-6">
+          {events.map((formation) => (
+            <div
+              key={formation.id}
+              id={`event-${formation.id}`}
+              className="bg-white rounded-xl shadow-sm overflow-hidden"
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {formation.type}
+                    </h2>
+                    <div className="mt-2 space-y-2">
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Date : </span>
+                        {format(new Date(formation.startDate), "d MMMM yyyy", { locale: fr })}
+                        {" - "}
+                        {format(new Date(formation.endDate), "d MMMM yyyy", { locale: fr })}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Lieu : </span>
+                        {formation.location}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Participants : </span>
+                        {formation.participantsCount || 0}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => handleToggleParticipation(formation.id)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                        ${isUserParticipating(formation)
+                          ? "bg-red-100 text-red-700 hover:bg-red-200"
+                          : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                        }`}
+                    >
+                      {isUserParticipating(formation) ? "Se désinscrire" : "S'inscrire"}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => toggleEventExpansion(formation.id)}
+                  className="mt-4 flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <motion.span
+                    animate={{ rotate: expandedEvents[formation.id] ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ChevronDownIcon className="h-5 w-5" />
+                  </motion.span>
+                  <span className="ml-2">Voir les participants</span>
+                </button>
+
+                <AnimatePresence>
+                  {expandedEvents[formation.id] && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-4 space-y-4">
+                        {formation.instructorParticipants?.length > 0 && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Instructeurs</h3>
+                            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {formation.instructorParticipants.map((instructor) => (
+                                <div
+                                  key={instructor.id}
+                                  className="flex items-center space-x-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-2"
+                                >
+                                  <span>{instructor.firstname} {instructor.lastname}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {formation.studentParticipants?.length > 0 && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Étudiants</h3>
+                            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {formation.studentParticipants.map((student) => (
+                                <div
+                                  key={student.id}
+                                  className="flex items-center space-x-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-2"
+                                >
+                                  <span>{student.firstname} {student.lastname}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 }
