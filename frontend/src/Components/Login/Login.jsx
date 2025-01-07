@@ -3,32 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import backgroundImage from "../../assets/images/Haidong-1.jpg";
 import logoFrance from "../../assets/icones/logo-france.png";
+import { Link } from "react-router-dom";
 
-// function Login() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [error, setError] = useState(null);
-//   const navigate = useNavigate();
-
-//   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const response = await axios.post(`${API_URL}/api/login_check`, {
-//         username: email,
-//         password: password,
-//       });
-
-//       if (response.data.token) {
-//         localStorage.setItem("token", response.data.token);
-//         navigate("/dashboard");
-//       }
-//     } catch (err) {
-//       setError("Email ou mot de passe incorrect");
-//       console.error("Erreur de connexion:", err);
-//     }
-//   };
 
 import { useDispatch } from 'react-redux';
 import { setToken } from '../../store/slices/authSlice';
@@ -144,6 +120,7 @@ function Login() {
             >
               Se connecter
             </button>
+            <Link to="/forgot-password">Mot de passe oublié ?</Link>
           </form>
           {/* Logo France */}
           <div className="absolute bottom-4 right-4 w-8 h-12">

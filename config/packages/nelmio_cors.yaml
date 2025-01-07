@@ -9,7 +9,7 @@ nelmio_cors:
     paths:
         '^/api/':
             allow_origin: ['https://samurang-portal.nqx.fr', 'https://www.samurang-portal.nqx.fr', 'http://localhost:3000']
-            allow_headers: ['Content-Type', 'Authorization']
+            allow_headers: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
             allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
             max_age: 3600
             allow_credentials: true

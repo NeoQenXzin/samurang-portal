@@ -20,183 +20,183 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity(repositoryClass: InstructorRepository::class)]
 class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \Stringable
 {
-    
+
     public function __toString(): string
-{
-    return $this->getFirstName() . ' ' . $this->getLastName() . ' (' . $this->getMail() . ')';
-}
+    {
+        return $this->getFirstName() . ' ' . $this->getLastName() . ' (' . $this->getMail() . ')';
+    }
 
-#[ORM\Id]
-#[ORM\GeneratedValue]
-#[ORM\Column]
-#[Groups(['instructor:write', 'formation:read'])]
-private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['instructor:write', 'formation:read'])]
+    private ?int $id = null;
 
-#[ORM\Column(length: 70)]
-#[Groups(['instructor:read', 'instructor:write', 'formation:read'])]
-private ?string $firstname = null;
+    #[ORM\Column(length: 70)]
+    #[Groups(['instructor:read', 'instructor:write', 'formation:read'])]
+    private ?string $firstname = null;
 
-#[ORM\Column(length: 70)]
-#[Groups(['instructor:read', 'instructor:write', 'formation:read'])]
-private ?string $lastname = null;
+    #[ORM\Column(length: 70)]
+    #[Groups(['instructor:read', 'instructor:write', 'formation:read'])]
+    private ?string $lastname = null;
 
- #[Groups(['instructor:read', 'instructor:write'])]
-#[ORM\Column(type: Types::DATETIME_MUTABLE)]
-private ?\DateTimeInterface $birthdate = null;
+    #[Groups(['instructor:read', 'instructor:write'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $birthdate = null;
 
- #[Groups(['instructor:read', 'instructor:write'])]
-#[ORM\Column(length: 255)]
-private ?string $adress = null;
+    #[Groups(['instructor:read', 'instructor:write'])]
+    #[ORM\Column(length: 255)]
+    private ?string $adress = null;
 
- #[Groups(['instructor:read', 'instructor:write'])]
-#[ORM\Column(length: 25)]
-private ?string $sexe = null;
+    #[Groups(['instructor:read', 'instructor:write'])]
+    #[ORM\Column(length: 25)]
+    private ?string $sexe = null;
 
- #[Groups(['instructor:read', 'instructor:write'])]
-#[ORM\Column(length: 25, nullable: true)]
-private ?string $tel = null;
+    #[Groups(['instructor:read', 'instructor:write'])]
+    #[ORM\Column(length: 25, nullable: true)]
+    private ?string $tel = null;
 
- #[Groups(['instructor:read', 'instructor:write'])]
-#[ORM\Column(length: 70)]
-private ?string $mail = null;
+    #[Groups(['instructor:read', 'instructor:write'])]
+    #[ORM\Column(length: 70)]
+    private ?string $mail = null;
 
-#[Groups(['instructor:read', 'instructor:write'])]
-#[ORM\Column(length: 25, nullable: true)]
-private ?string $passport = null;
+    #[Groups(['instructor:read', 'instructor:write'])]
+    #[ORM\Column(length: 25, nullable: true)]
+    private ?string $passport = null;
 
-#[Groups(['instructor:read', 'instructor:write'])]
-#[ORM\ManyToOne(inversedBy: 'instructors')]
-#[ORM\JoinColumn(nullable: false)]
-private ?Grade $grade = null;
+    #[Groups(['instructor:read', 'instructor:write'])]
+    #[ORM\ManyToOne(inversedBy: 'instructors')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Grade $grade = null;
 
-#[Groups(['instructor:read', 'instructor:write'])]
-#[ORM\ManyToOne(inversedBy: 'instructors')]
-private ?Dojang $dojang = null;
+    #[Groups(['instructor:read', 'instructor:write'])]
+    #[ORM\ManyToOne(inversedBy: 'instructors')]
+    private ?Dojang $dojang = null;
 
-public function getId(): ?int
-{
-    return $this->id;
-}
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-public function getFirstname(): ?string
-{
-    return $this->firstname;
-}
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
 
-public function setFirstname(string $firstname): static
-{
-    $this->firstname = $firstname;
+    public function setFirstname(string $firstname): static
+    {
+        $this->firstname = $firstname;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getLastname(): ?string
-{
-    return $this->lastname;
-}
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
 
-public function setLastname(string $lastname): static
-{
-    $this->lastname = $lastname;
+    public function setLastname(string $lastname): static
+    {
+        $this->lastname = $lastname;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getBirthdate(): ?\DateTimeInterface
-{
-    return $this->birthdate;
-}
+    public function getBirthdate(): ?\DateTimeInterface
+    {
+        return $this->birthdate;
+    }
 
-public function setBirthdate(\DateTimeInterface $birthdate): static
-{
-    $this->birthdate = $birthdate;
+    public function setBirthdate(\DateTimeInterface $birthdate): static
+    {
+        $this->birthdate = $birthdate;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getAdress(): ?string
-{
-    return $this->adress;
-}
+    public function getAdress(): ?string
+    {
+        return $this->adress;
+    }
 
-public function setAdress(string $adress): static
-{
-    $this->adress = $adress;
+    public function setAdress(string $adress): static
+    {
+        $this->adress = $adress;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getSexe(): ?string
-{
-    return $this->sexe;
-}
+    public function getSexe(): ?string
+    {
+        return $this->sexe;
+    }
 
-public function setSexe(string $sexe): static
-{
-    $this->sexe = $sexe;
+    public function setSexe(string $sexe): static
+    {
+        $this->sexe = $sexe;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getTel(): ?string
-{
-    return $this->tel;
-}
+    public function getTel(): ?string
+    {
+        return $this->tel;
+    }
 
-public function setTel(?string $tel): static
-{
-    $this->tel = $tel;
+    public function setTel(?string $tel): static
+    {
+        $this->tel = $tel;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getMail(): ?string
-{
-    return $this->mail;
-}
+    public function getMail(): ?string
+    {
+        return $this->mail;
+    }
 
-public function setMail(string $mail): static
-{
-    $this->mail = $mail;
+    public function setMail(string $mail): static
+    {
+        $this->mail = $mail;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getPassport(): ?string
-{
-    return $this->passport;
-}
+    public function getPassport(): ?string
+    {
+        return $this->passport;
+    }
 
-public function setPassport(?string $passport): static
-{
-    $this->passport = $passport;
+    public function setPassport(?string $passport): static
+    {
+        $this->passport = $passport;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getGrade(): ?Grade
-{
-    return $this->grade;
-}
+    public function getGrade(): ?Grade
+    {
+        return $this->grade;
+    }
 
-public function setGrade(?Grade $grade): static
-{
-    $this->grade = $grade;
+    public function setGrade(?Grade $grade): static
+    {
+        $this->grade = $grade;
 
-    return $this;
-}
+        return $this;
+    }
 
-public function getDojang(): ?Dojang
-{
-    return $this->dojang;
-}
+    public function getDojang(): ?Dojang
+    {
+        return $this->dojang;
+    }
 
-public function setDojang(?Dojang $dojang): static
-{
-    $this->dojang = $dojang;
+    public function setDojang(?Dojang $dojang): static
+    {
+        $this->dojang = $dojang;
 
-    return $this;
-}
+        return $this;
+    }
     /**
      * @var Collection<int, Student>
      */
@@ -268,7 +268,7 @@ public function setDojang(?Dojang $dojang): static
     #[ORM\ManyToMany(targetEntity: Formation::class, mappedBy: 'instructorParticipants')]
     private Collection $participatedFormations;
 
- 
+
 
     /**
      * A visual identifier that represents this user.
@@ -381,6 +381,34 @@ public function setDojang(?Dojang $dojang): static
             $participatedFormation->removeInstructorParticipant($this);
         }
 
+        return $this;
+    }
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $resetTokenExpiresAt = null;
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
+
+    public function getResetTokenExpiresAt(): ?\DateTimeInterface
+    {
+        return $this->resetTokenExpiresAt;
+    }
+
+    public function setResetTokenExpiresAt(?\DateTimeInterface $resetTokenExpiresAt): self
+    {
+        $this->resetTokenExpiresAt = $resetTokenExpiresAt;
         return $this;
     }
 }

@@ -12,6 +12,8 @@ import Profil from './Components/Profil/Profil';
 import Login from './Components/Login/Login';
 import Logout from './Components/Login/Logout';
 import Navbar from './Components/Navbar/Navbar';
+import ForgotPassword from './Components/ForgotPassword/ForgotPassword';
+import ResetPassword from './Components/ResetPassword/ResetPassword';
 import dojo from './assets/icones/dojo-1.png'
 import calendar from './assets/icones/calendar.png'
 import symbol from './assets/icones/symbol.png'
@@ -70,6 +72,14 @@ function App() {
                   <Navigate to="/dashboard" replace /> :
                   <Login />
               }
+            />
+            <Route
+              path="/forgot-password"
+              element={<ForgotPassword />}
+            />
+            <Route
+              path="/reset-password/:token"
+              element={<ResetPassword />}
             />
             <Route
               path="/dashboard"

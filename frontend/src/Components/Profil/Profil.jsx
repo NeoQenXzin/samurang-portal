@@ -12,6 +12,7 @@ export default function Profil() {
   const dispatch = useDispatch();
   const { userData, isLoading, error } = useSelector((state) => state.profile);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const userRole = userData.user.roles[0];
 
   useEffect(() => {
     dispatch(fetchUserProfile());
@@ -41,6 +42,10 @@ export default function Profil() {
 
   const handleSuperAdminAccess = () => {
     window.open("http://localhost:8000/admin", "_blank");
+  };
+
+  const handleContactAdmin = () => {
+    window.location.href = "mailto:quentin.pecharroman13@gmail.com";
   };
 
   const UserModal = () => (
@@ -210,6 +215,15 @@ export default function Profil() {
               </button>
             )}
         </div>
+
+        {userRole === "ROLE_INSTRUCTOR" && (
+          <button
+            onClick={handleContactAdmin}
+            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Contacter l'administrateur
+          </button>
+        )}
       </div>
 
       {/* Modal pour les informations complètes */}
