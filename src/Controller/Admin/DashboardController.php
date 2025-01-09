@@ -72,19 +72,7 @@ class DashboardController extends AbstractDashboardController
         );
     }
 
-    // public function configureUserMenu(UserInterface $user): UserMenu
-    // {
-    //     return parent::configureUserMenu($user)
-    //         ->setName($user->getUsername())
-    //         ->setGravatarEmail($user->getEmail())
-    //         ->setAvatarUrl('https://example.com/avatar.jpg')
-    //         ->addMenuItems([
-    //             MenuItem::linkToRoute('My Profile', 'fa fa-id-card', '...'),
-    //             MenuItem::linkToRoute('Settings', 'fa fa-user-cog', '...'),
-    //             MenuItem::section(),
-    //             MenuItem::linkToLogout('Logout', 'fa fa-sign-out'),
-    //         ]);
-    // }
+   
 
     public function configureAssets(): Assets
     {

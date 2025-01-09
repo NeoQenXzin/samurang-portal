@@ -12,6 +12,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ApiResource(
     normalizationContext: ['groups' => ['instructor:read']],
@@ -32,22 +34,27 @@ class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \
     #[Groups(['instructor:write', 'formation:read'])]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: "Le prénom est obligatoire")]
     #[ORM\Column(length: 70)]
     #[Groups(['instructor:read', 'instructor:write', 'formation:read'])]
     private ?string $firstname = null;
 
+    #[Assert\NotBlank(message: "Le nom est obligatoire")]
     #[ORM\Column(length: 70)]
     #[Groups(['instructor:read', 'instructor:write', 'formation:read'])]
     private ?string $lastname = null;
 
+    #[Assert\NotBlank(message: "La date de naissance est obligatoire")]
     #[Groups(['instructor:read', 'instructor:write'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $birthdate = null;
 
+    #[Assert\NotBlank(message: "L'adresse est obligatoire")]
     #[Groups(['instructor:read', 'instructor:write'])]
     #[ORM\Column(length: 255)]
     private ?string $adress = null;
 
+    #[Assert\NotBlank(message: "Le sexe est obligatoire")]
     #[Groups(['instructor:read', 'instructor:write'])]
     #[ORM\Column(length: 25)]
     private ?string $sexe = null;
@@ -56,6 +63,7 @@ class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \
     #[ORM\Column(length: 25, nullable: true)]
     private ?string $tel = null;
 
+    #[Assert\NotBlank(message: "Le mail est obligatoire")]
     #[Groups(['instructor:read', 'instructor:write'])]
     #[ORM\Column(length: 70)]
     private ?string $mail = null;
@@ -64,11 +72,13 @@ class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \
     #[ORM\Column(length: 25, nullable: true)]
     private ?string $passport = null;
 
+    #[Assert\NotBlank(message: "Le grade est obligatoire")]
     #[Groups(['instructor:read', 'instructor:write'])]
-    #[ORM\ManyToOne(inversedBy: 'instructors')]
+    #[ORM\ManyToOne(inversedBy: 'instructors') ]
     #[ORM\JoinColumn(nullable: false)]
     private ?Grade $grade = null;
 
+    #[Assert\NotBlank(message: "Le dojang est obligatoire")]
     #[Groups(['instructor:read', 'instructor:write'])]
     #[ORM\ManyToOne(inversedBy: 'instructors')]
     private ?Dojang $dojang = null;
@@ -245,12 +255,14 @@ class Instructor implements UserInterface, PasswordAuthenticatedUserInterface, \
     /**
      * @var list<string> The user roles
      */
+    #[Assert\NotBlank(message: "Le rôle est obligatoire")]
     #[ORM\Column]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire")]
     #[ORM\Column]
     private ?string $password = null;
 
