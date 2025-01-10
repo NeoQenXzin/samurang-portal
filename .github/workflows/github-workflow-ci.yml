@@ -52,7 +52,7 @@ jobs:
           APP_ENV: test
           JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
           KERNEL_CLASS: 'App\Kernel'
-          SYMFONY_DEPRECATIONS_HELPER: '/doctrine\/orm/'
+          SYMFONY_DEPRECATIONS_HELPER: disabled
         run: |
           php bin/console cache:clear --env=test
           php bin/phpunit --debug
