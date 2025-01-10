@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -21,9 +21,24 @@ jobs:
 
       - name: Copy .env.test
         run: php -r "file_exists('.env.test') || copy('.env.test.dist', '.env.test');"
-      
+        
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      # Ajout des étapes pour EasyAdmin et API Platform
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Build assets
+        run: |
+          npm run build
+          php bin/console assets:install public
+          php bin/console cache:clear --env=test
 
       - name: Generate JWT Keys
         run: |
@@ -40,13 +55,13 @@ jobs:
           php bin/console doctrine:schema:create --env=test
           php bin/console doctrine:fixtures:load --env=test --no-interaction
 
-
       - name: Execute Tests
         env:
           DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
           APP_ENV: test
           JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
-        run: php bin/phpunit
+        run: php bin/phpunit --debug
+
 
 
   frontend-tests:
