@@ -34,8 +34,8 @@ jobs:
       - name: Setup Database
         env:
           DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
-        APP_ENV: test
-        JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
+          APP_ENV: test
+          JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
         run: |
           php bin/console doctrine:schema:create --env=test
           php bin/console doctrine:fixtures:load --env=test --no-interaction
