@@ -1,0 +1,9 @@
+security:
+    firewalls:
+        main:
+            json_login:
+                check_path: api_login_check
+            form_login:
+                enable_csrf: false
+            entry_point: form_login
+            provider: app_user_provider 

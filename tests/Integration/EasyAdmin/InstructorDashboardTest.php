@@ -143,12 +143,18 @@ class InstructorDashboardTest extends WebTestCase
 
     private function loginAsInstructor(): void
     {
-        $this->client->request('GET', '/login');
-        $this->client->submitForm('Sign in', [
+        // $this->client->request('GET', '/login');
+        // $this->client->submitForm('Se connecter', [
+        //     '_username' => 'instructor@test.com',
+        //     '_password' => 'test123',
+        // ]);
+        // $this->client->followRedirect();
+        $this->client->request('POST', '/login', [
             '_username' => 'instructor@test.com',
-            '_password' => 'test123',
+            '_password' => 'test123'
         ]);
         $this->client->followRedirect();
+        
     }
 
     protected function tearDown(): void
