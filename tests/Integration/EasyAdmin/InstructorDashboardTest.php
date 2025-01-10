@@ -149,6 +149,7 @@ class InstructorDashboardTest extends WebTestCase
             '_password' => 'test123',
         ]);
         $this->client->followRedirect();
+        
     }
 
     protected function tearDown(): void
