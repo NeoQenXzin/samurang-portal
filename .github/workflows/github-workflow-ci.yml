@@ -51,7 +51,10 @@ jobs:
           DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
           APP_ENV: test
           JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
-        run: php bin/phpunit --debug
+          KERNEL_CLASS: 'App\Kernel'
+        run: |
+          php bin/console cache:clear --env=test
+          php bin/phpunit --debug
 
 
   frontend-tests:
