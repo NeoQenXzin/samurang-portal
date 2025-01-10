@@ -11,7 +11,7 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->baseUrl = getenv('APP_ENV') === 'local'
+        $this->baseUrl = getenv('APP_ENV') === 'test'
             ?  'https://samurang-portal.nqx.fr' : 'http://localhost:8000';
     }
 }
