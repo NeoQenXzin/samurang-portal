@@ -8,8 +8,9 @@ use App\Entity\Dojang;
 use App\Entity\Student;
 use App\Entity\Formation;
 use App\Entity\Instructor;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 class InstructorDashboardTest extends WebTestCase
 {
@@ -150,7 +151,18 @@ class InstructorDashboardTest extends WebTestCase
         ]);
         $this->client->followRedirect();
     }
-
+    public function testLoginPage(): void
+    {
+        $crawler = $this->client->request('GET', '/login');
+        $html = $this->client->getResponse()->getContent();
+        echo $html; // Affiche le HTML dans la console PHPUnit
+        $this->assertSelectorExists('form'); // Vérifie qu'un formulaire est bien présent
+    }
+    public function testSecurityConfig(): void
+{
+    $config = static::getContainer()->getParameter('security.password_hashers');
+    $this->assertArrayHasKey(PasswordAuthenticatedUserInterface::class, $config);
+}
     protected function tearDown(): void
     {
         parent::tearDown();
