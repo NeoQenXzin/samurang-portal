@@ -61,7 +61,7 @@ class InstructorDashboardTest extends WebTestCase
 
         // Test d'accès au dashboard
         $crawler = $this->client->request('GET', '/mydojang');
-
+        
         // Vérifications du contenu
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('.content-header-title', 'Welcome to Your Dojang');
@@ -81,7 +81,7 @@ class InstructorDashboardTest extends WebTestCase
     //     // Test création d'étudiant
     //     $crawler = $this->client->request('GET', '/mydojang/student/new');
     //     $this->assertResponseIsSuccessful();
-
+        
     //     // Vérification des champs du formulaire
     //     $this->assertSelectorExists('input[name="Student[firstName]"]');
     //     $this->assertSelectorExists('input[name="Student[lastName]"]');
@@ -101,7 +101,7 @@ class InstructorDashboardTest extends WebTestCase
     //     // Test création de formation
     //     $crawler = $this->client->request('GET', '/mydojang/formation/new');
     //     $this->assertResponseIsSuccessful();
-
+        
     //     // Vérification des champs du formulaire
     //     $this->assertSelectorExists('select[name="Formation[type]"]');
     //     $this->assertSelectorExists('textarea[name="Formation[description]"]');
@@ -116,7 +116,7 @@ class InstructorDashboardTest extends WebTestCase
 
         // Test accès avec authentification
         $this->loginAsInstructor();
-
+        
         // Test accès au dashboard admin (doit être refusé)
         $this->client->request('GET', '/admin');
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
@@ -132,7 +132,7 @@ class InstructorDashboardTest extends WebTestCase
         // $otherStudent->setPassword('password');
         // $otherStudent->setGrade($this->grade);
         // $otherStudent->setDojang($this->dojang);
-
+        
         // $this->entityManager->persist($otherStudent);
         // $this->entityManager->flush();
 
@@ -143,13 +143,18 @@ class InstructorDashboardTest extends WebTestCase
 
     private function loginAsInstructor(): void
     {
-        $crawler = $this->client->request('GET', '/login');
-        $form = $crawler->selectButton('Se connecter')->form();
-        $this->client->submit($form, [
+        // $this->client->request('GET', '/login');
+        // $this->client->submitForm('Se connecter', [
+        //     '_username' => 'instructor@test.com',
+        //     '_password' => 'test123',
+        // ]);
+        // $this->client->followRedirect();
+        $this->client->request('POST', '/login', [
             '_username' => 'instructor@test.com',
             '_password' => 'test123'
         ]);
         $this->client->followRedirect();
+        
     }
 
     protected function tearDown(): void
@@ -162,7 +167,7 @@ class InstructorDashboardTest extends WebTestCase
             $this->entityManager->createQuery('DELETE FROM App\Entity\Instructor')->execute();
             $this->entityManager->createQuery('DELETE FROM App\Entity\Grade')->execute();
             $this->entityManager->createQuery('DELETE FROM App\Entity\Dojang')->execute();
-
+            
             $this->entityManager->close();
             $this->entityManager = null;
         }
