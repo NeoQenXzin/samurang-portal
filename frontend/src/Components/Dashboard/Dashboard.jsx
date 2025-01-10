@@ -9,7 +9,6 @@ import { GiBlackBelt } from "react-icons/gi";
 import { toast } from "react-toastify";
 
 export default function Dashboard() {
-  
   const dispatch = useDispatch();
   const {
     userData,
@@ -80,7 +79,7 @@ export default function Dashboard() {
   if (profileError || ordersError) {
     return (
       <div className="text-center text-red-500 mt-4">
-        {profileError || ordersError}
+        {profileError?.message || ordersError?.message || "API Error"}
       </div>
     );
   }
