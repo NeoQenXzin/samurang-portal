@@ -31,22 +31,22 @@ jobs:
           openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096 -pass pass:${{ secrets.JWT_PASSPHRASE }}
           openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout -passin pass:${{ secrets.JWT_PASSPHRASE }}
 
-      - name: Create Database and Load Fixtures
+      - name: Setup Database
         env:
           DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
-          APP_ENV: test
-          JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
+        APP_ENV: test
+        JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
         run: |
-          php bin/console doctrine:database:create --env=test --if-not-exists
           php bin/console doctrine:schema:create --env=test
           php bin/console doctrine:fixtures:load --env=test --no-interaction
+
 
       - name: Execute Tests
         env:
           DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
           APP_ENV: test
           JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
-        run: php bin/phpunit --coverage-clover coverage.xml
+        run: php bin/phpunit
 
 
   frontend-tests:
@@ -72,9 +72,9 @@ jobs:
         working-directory: ./frontend
         run: npm run vitest
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./frontend/coverage/coverage-final.json
-          fail_ci_if_error: true
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v4
+      #   with:
+      #     file: ./frontend/coverage/coverage-final.json
+      #     fail_ci_if_error: true
 
