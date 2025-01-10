@@ -144,6 +144,17 @@ class InstructorDashboardTest extends WebTestCase
     private function loginAsInstructor(): void
     {
         $this->client->request('GET', '/login');
+        
+        // Debug: Afficher le HTML du formulaire
+        $crawler = $this->client->request('GET', '/login');
+        var_dump($crawler->filter('form')->html());
+        
+        // Trouvons les noms réels des champs
+        $form = $crawler->filter('form')->form();
+        $formData = [
+        $form->get('email')->getName() => 'instructor@test.com',  // ou '_username'
+        $form->get('password')->getName() => 'test123',  // ou '_password'
+    ]; //fin debug
         $this->client->submitForm('Sign in', [
             '_username' => 'instructor@test.com',
             '_password' => 'test123',
