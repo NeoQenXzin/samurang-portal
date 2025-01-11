@@ -56,6 +56,25 @@ jobs:
         run: |
           php bin/console cache:clear --env=test
           php bin/phpunit --debug
+        
+        - name: Execute Tests with Coverage
+          env:
+            DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
+            APP_ENV: test
+            JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
+            KERNEL_CLASS: 'App\Kernel'
+            SYMFONY_DEPRECATIONS_HELPER: disabled
+          run: |
+            php bin/console cache:clear --env=test
+            XDEBUG_MODE=coverage php bin/phpunit --coverage-clover coverage.xml
+
+        - name: Upload Backend Coverage to Codecov
+          uses: codecov/codecov-action@v4
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            files: ./coverage.xml
+            flags: backend
+            fail_ci_if_error: true
 
 
   frontend-tests:
@@ -81,9 +100,16 @@ jobs:
         working-directory: ./frontend
         run: npm run vitest
 
-      # - name: Upload coverage to Codecov
-      #   uses: codecov/codecov-action@v4
-      #   with:
-      #     file: ./frontend/coverage/coverage-final.json
-      #     fail_ci_if_error: true
+      - name: Run tests
+        run: npx vitest run --coverage
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: NeoQenXzin/samurang-portal
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
