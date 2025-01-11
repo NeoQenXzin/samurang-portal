@@ -1,0 +1,33 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 2%
+      backend:
+        target: 80%
+        flags:
+          - backend
+      frontend:
+        target: 80%
+        flags:
+          - frontend
+    patch:
+      default:
+        target: 80%
+
+flags:
+  backend:
+    paths:
+      - src/
+    carryforward: true
+  frontend:
+    paths:
+      - frontend/src/
+    carryforward: true
+
+ignore:
+  - "src/DataFixtures"
+  - "src/Migrations"
+  - "tests"
+  - "frontend/tests" 

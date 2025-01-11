@@ -25,7 +25,6 @@ jobs:
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-      # Installation des assets Symfony
       - name: Install Symfony assets
         run: |
           php bin/console assets:install public --env=test
@@ -46,7 +45,7 @@ jobs:
           php bin/console doctrine:schema:create --env=test
           php bin/console doctrine:fixtures:load --env=test --no-interaction
 
-      - name: Execute Tests
+      - name: Execute Tests with Coverage
         env:
           DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
           APP_ENV: test
@@ -55,12 +54,18 @@ jobs:
           SYMFONY_DEPRECATIONS_HELPER: disabled
         run: |
           php bin/console cache:clear --env=test
-          php bin/phpunit --debug
+          XDEBUG_MODE=coverage php bin/phpunit --coverage-clover coverage.xml
 
+      - name: Upload Backend Coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          flags: backend
+          fail_ci_if_error: true
 
   frontend-tests:
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v4
 
@@ -79,11 +84,12 @@ jobs:
 
       - name: Run Tests
         working-directory: ./frontend
-        run: npm run vitest
+        run: npx vitest run --coverage
 
-      # - name: Upload coverage to Codecov
-      #   uses: codecov/codecov-action@v4
-      #   with:
-      #     file: ./frontend/coverage/coverage-final.json
-      #     fail_ci_if_error: true
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: NeoQenXzin/samurang-portal
+
 

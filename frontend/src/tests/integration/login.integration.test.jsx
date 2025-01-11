@@ -10,8 +10,8 @@ import profileReducer from "../../store/slices/profileSlice.js";
 import eventsReducer from "../../store/slices/eventsSlice.js";
 import ordersReducer from "../../store/slices/ordersSlice.js";
 
-// Configuration du store Redux pour les tests
-const createTestStore = () =>
+// Utilitaire pour configurer un store Redux de test
+const setupTestStore = () =>
   configureStore({
     reducer: {
       auth: authReducer,
@@ -21,10 +21,10 @@ const createTestStore = () =>
     },
   });
 
-// Mock d'axios pour simuler les appels API
+// Mock d'axios pour les appels API
 vi.mock("axios");
 
-// Mock du hook useNavigate de react-router
+// Mock de useNavigate pour simuler la navigation
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
@@ -34,25 +34,24 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// URL de l'API (utilise une variable d'environnement avec une valeur par défaut)
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
-// Test de l'authentification
-describe("Login Integration Test", () => {
+describe("Login Component Integration Tests", () => {
   let store;
 
-  // Avant chaque test
   beforeEach(() => {
-    // Reset du store avant chaque test
-    store = createTestStore();
-
-    // Reset des mocks 
+    // Réinitialisation du store et des mocks avant chaque test
+    store = setupTestStore();
     vi.clearAllMocks();
     window.localStorage.clear();
   });
 
-  // Helper pour rendre le composant avec tous ses providers
+  /**
+   * Helper pour rendre le composant Login avec les providers nécessaires
+   */
   const renderLoginComponent = () => {
-    return render(
+    render(
       <Provider store={store}>
         <BrowserRouter>
           <Login />
@@ -61,17 +60,15 @@ describe("Login Integration Test", () => {
     );
   };
 
-  // Test du cas de succès
-  it("should authenticate user and redirect to dashboard with user data", async () => {
+  it("should authenticate the user, save token, and redirect to the dashboard", async () => {
     const mockToken = "fake-jwt-token";
-    // Simulation de la réponse API réussie
-    axios.post.mockResolvedValueOnce({
-      data: { token: mockToken },
-    });
+
+    // Mock de la réponse réussie de l'API
+    axios.post.mockResolvedValueOnce({ data: { token: mockToken } });
 
     renderLoginComponent();
-    // fill the form
-    // Simulation des interactions utilisateur
+
+    // Simuler le remplissage du formulaire et l'envoi
     const emailInput = screen.getByPlaceholderText(/email/i);
     const passwordInput = screen.getByPlaceholderText(/password/i);
     const submitButton = screen.getByRole("button", { name: /se connecter/i });
@@ -80,30 +77,27 @@ describe("Login Integration Test", () => {
     fireEvent.change(passwordInput, { target: { value: "password123" } });
     fireEvent.click(submitButton);
 
-    // Vérification des comportements attendus
+    // Vérification des appels API
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith(
-        `${API_URL}/api/login_check`,
-        {
-          username: "test@example.com",
-          password: "password123",
-        }
-      );
+      expect(axios.post).toHaveBeenCalledWith(`${API_URL}/api/login_check`, {
+        username: "test@example.com",
+        password: "password123",
+      });
     });
 
+    // Vérification de la navigation et des données stockées
     expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
     expect(window.localStorage.getItem("token")).toBe(mockToken);
     expect(store.getState().auth.token).toBe(mockToken);
   });
 
-  // Test du cas d'échec
-  it("should show error message on failed login", async () => {
-    // Simulation d'une erreur API
+  it("should display an error message when login fails", async () => {
+    // Mock d'une erreur lors de l'appel à l'API
     axios.post.mockRejectedValueOnce(new Error("Invalid credentials"));
 
     renderLoginComponent();
 
-    // Simulation des interactions utilisateur
+    // Simuler le remplissage du formulaire avec des données invalides
     const emailInput = screen.getByPlaceholderText(/email/i);
     const passwordInput = screen.getByPlaceholderText(/password/i);
     const submitButton = screen.getByRole("button", { name: /se connecter/i });
@@ -118,6 +112,8 @@ describe("Login Integration Test", () => {
         screen.getByText("Email ou mot de passe incorrect")
       ).toBeInTheDocument();
     });
+
+    // Vérification que la navigation ne s'est pas produite
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 });
