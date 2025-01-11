@@ -54,6 +54,7 @@ class AuthenticationIntegrationTest extends WebTestCase
         $this->entityManager->flush();
     }
 
+    // Test d'authentification avec des informations correctes
     public function testInstructorAuthentication(): void
     {
         // Génération du token JWT
@@ -97,6 +98,7 @@ class AuthenticationIntegrationTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    // Test d'authentification avec des informations incorrectes
     public function testInvalidAuthentication(): void
     {
         $this->client->request(
@@ -114,6 +116,7 @@ class AuthenticationIntegrationTest extends WebTestCase
         $this->assertResponseStatusCodeSame(401);
     }
 
+    // Test de la validité du payload du token
     public function testTokenPayload(): void
     {
         $token = $this->jwtManager->create($this->instructor);
@@ -124,6 +127,7 @@ class AuthenticationIntegrationTest extends WebTestCase
         $this->assertTrue(in_array('ROLE_INSTRUCTOR', $payload['roles']));
     }
 
+    // Test de déconnexion
     public function testLogout(): void
     {
         $token = $this->jwtManager->create($this->instructor);
@@ -146,7 +150,7 @@ class AuthenticationIntegrationTest extends WebTestCase
 
     }
 
-
+    // Nettoyage des données de test
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -156,7 +160,6 @@ class AuthenticationIntegrationTest extends WebTestCase
             $this->entityManager->createQuery('DELETE FROM App\Entity\Instructor')->execute();
             $this->entityManager->createQuery('DELETE FROM App\Entity\Grade')->execute();
             $this->entityManager->createQuery('DELETE FROM App\Entity\Dojang')->execute();
-            // $this->entityManager->createQuery('DELETE FROM App\Entity\Formation')->execute();
 
             $this->entityManager->close();
             $this->entityManager = null;

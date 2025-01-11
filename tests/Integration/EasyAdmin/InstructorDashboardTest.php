@@ -55,6 +55,7 @@ class InstructorDashboardTest extends WebTestCase
         $this->entityManager->flush();
     }
 
+    // Test d'accès au dashboard
     public function testDashboardAccessAndContent(): void
     {
         $this->loginAsInstructor();
@@ -108,6 +109,7 @@ class InstructorDashboardTest extends WebTestCase
     //     $this->assertSelectorExists('input[name="Formation[location]"]');
     // }
 
+    // Test de sécurité
     public function testSecurityRestrictions(): void
     {
         // Test accès sans authentification
@@ -141,6 +143,7 @@ class InstructorDashboardTest extends WebTestCase
         // $this->assertSelectorNotExists('td:contains("Other Student")');
     }
 
+    // Fonction privée pour se connecter en tant qu'instructeur
     private function loginAsInstructor(): void
     {
         // $this->client->request('GET', '/login');
