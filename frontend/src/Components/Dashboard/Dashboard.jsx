@@ -4,7 +4,7 @@ import { fetchUserProfile } from "../../store/slices/profileSlice";
 import { fetchEvents } from "../../store/slices/eventsSlice";
 import { fetchOrders } from "../../store/slices/ordersSlice";
 import { Link } from "react-router-dom";
-import { FaUser, FaCalendarAlt, FaShoppingBag } from "react-icons/fa";
+import { FaUser, FaCalendarAlt, FaShoppingBag, FaBoxOpen, FaBox } from "react-icons/fa";
 import { GiBlackBelt } from "react-icons/gi";
 import { toast } from "react-toastify";
 
@@ -30,11 +30,9 @@ export default function Dashboard() {
     dispatch(fetchEvents());
   }, [dispatch]);
 
-  const getUserEvents = () => {
+  // Afficher uniquement les évenements qui ne sont pas passés auquel l'utilisateur est inscrit
+  const getUpcomingEvents = () => {
     if (!events || !userData?.user) return [];
-
-    // console.log("Events:", events); // Pour le debug
-    // console.log("User:", userData.user); // Pour le debug
 
     const userEvents = events.filter((event) => {
       if (userData.user.roles.includes("ROLE_INSTRUCTOR")) {
@@ -51,14 +49,43 @@ export default function Dashboard() {
       );
     });
 
-    // console.log("Filtered events:", userEvents); // Pour le debug
-
-    return userEvents.sort(
-      (a, b) => new Date(a.startDate) - new Date(b.startDate)
-    );
+    const now = new Date();
+    return userEvents
+      .filter((event) => new Date(event.endDate) >= now)
+      .sort((a, b) => new Date(a.startDate) - new Date(b.startDate)); // Trier par date
   };
-  console.log(getUserEvents());
 
+  // Afficher tout les prochains évenements auquel l'utilisateur est inscrit
+  // const getUserEvents = () => {
+  //   if (!events || !userData?.user) return [];
+
+  //   // console.log("Events:", events); // Pour le debug
+  //   // console.log("User:", userData.user); // Pour le debug
+
+  //   const userEvents = events.filter((event) => {
+  //     if (userData.user.roles.includes("ROLE_INSTRUCTOR")) {
+  //       return (
+  //         event.instructorParticipants &&
+  //         Array.isArray(event.instructorParticipants) &&
+  //         event.instructorParticipants.some((p) => p.id === userData.user.id)
+  //       );
+  //     }
+  //     return (
+  //       event.studentParticipants &&
+  //       Array.isArray(event.studentParticipants) &&
+  //       event.studentParticipants.some((p) => p.id === userData.user.id)
+  //     );
+  //   });
+
+  //   // console.log("Filtered events:", userEvents); // Pour le debug
+
+  //   return userEvents.sort(
+  //     (a, b) => new Date(a.startDate) - new Date(b.startDate)
+  //   );
+  // };
+  // console.log(getUserEvents());
+
+  // Afficher le statut de la commande
   const getStatusLabel = (status) => {
     const statusMap = {
       not_ordered: "Pas encore passée",
@@ -68,6 +95,7 @@ export default function Dashboard() {
     return statusMap[status] || status;
   };
 
+  // Afficher le chargement de la page
   if (profileLoading || ordersLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -76,6 +104,7 @@ export default function Dashboard() {
     );
   }
 
+  // Afficher le message d'erreur
   if (profileError || ordersError) {
     return (
       <div className="text-center text-red-500 mt-4">
@@ -84,7 +113,26 @@ export default function Dashboard() {
     );
   }
 
-  const nextOrder = orders && orders.length > 0 ? orders[0] : null;
+  // Afficher la prochaine commande
+  const getNextOrder = () => {
+    if (!orders || orders.length === 0) return null;
+    const now = new Date();
+    return orders
+      .filter((order) => new Date(order.sendDate) >= now)
+      .sort((a, b) => new Date(a.sendDate) - new Date(b.sendDate))[0]; // Commande la plus proche
+  };
+  // Afficher les 3 commandes précédentes
+  const getPreviousOrders = () => {
+    if (!orders || orders.length === 0) return [];
+    const now = new Date();
+    return orders
+      .filter((order) => new Date(order.sendDate) < now)
+      .sort((a, b) => new Date(b.sendDate) - new Date(a.sendDate)) // Trier par date décroissante
+      .slice(0, 3); // Limiter à trois commandes
+  };
+
+  const nextOrder = getNextOrder();
+  const previousOrders = getPreviousOrders();
 
   return (
     <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
@@ -121,8 +169,8 @@ export default function Dashboard() {
             </h2>
           </div>
           <div className="space-y-4">
-            {getUserEvents().length > 0 ? (
-              getUserEvents().map((event) => (
+            {getUpcomingEvents().length > 0 ? (
+              getUpcomingEvents().map((event) => (
                 <Link
                   key={event.id}
                   to={`/events#event-${event.id}`}
@@ -146,40 +194,84 @@ export default function Dashboard() {
         </div>
 
         {/* Section Commandes */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center mb-6">
-            <FaShoppingBag className="h-5 w-5 text-blue-600 mr-2" />
-            <h2 className="text-xl font-semibold text-gray-900">
-              Prochaine commande
-            </h2>
+     {/* Section Commandes */}
+<div className="bg-white rounded-xl shadow-sm p-6">
+  {/* Prochaine commande */}
+  <div className="flex items-center mb-6">
+    <FaBox className="h-5 w-5 text-blue-600 mr-2" />
+    <h2 className="text-xl font-semibold text-gray-900">
+      Prochaine commande
+    </h2>
+  </div>
+  {nextOrder ? (
+    <div className="border border-gray-200 rounded-lg p-4">
+      <div className="text-sm text-gray-600 space-y-2">
+        <p>
+          Date d'envoi :{" "}
+          {new Date(nextOrder.sendDate).toLocaleDateString("fr-FR")}
+        </p>
+        <p>
+          Statut :
+          <span
+            className={`ml-2 px-2 py-1 rounded-full text-xs ${
+              nextOrder.status === "pending"
+                ? "bg-yellow-100 text-yellow-800"
+                : nextOrder.status === "received"
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {getStatusLabel(nextOrder.status)}
+          </span>
+        </p>
+      </div>
+    </div>
+  ) : (
+    <p className="text-gray-600">Aucune commande en cours</p>
+  )}
+
+  {/* Commandes précédentes (3 max)*/}
+  <div className="flex items-center mt-8 mb-6">
+    <FaBoxOpen className="h-5 w-5 text-blue-600 mr-2" />
+    <h2 className="text-xl font-semibold text-gray-900">
+      Commandes précédentes
+    </h2>
+  </div>
+  <div className="space-y-4">
+    {previousOrders.length > 0 ? (
+      previousOrders.map((order) => (
+        <div
+          key={order.id}
+          className="border border-gray-200 rounded-lg p-4"
+        >
+          <div className="text-sm text-gray-600 space-y-2">
+            <p>
+              Date d'envoi :{" "}
+              {new Date(order.sendDate).toLocaleDateString("fr-FR")}
+            </p>
+            <p>
+              Statut :
+              <span
+                className={`ml-2 px-2 py-1 rounded-full text-xs ${
+                  order.status === "pending"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : order.status === "received"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {getStatusLabel(order.status)}
+              </span>
+            </p>
           </div>
-          {nextOrder ? (
-            <div className="border border-gray-200 rounded-lg p-4">
-              <div className="text-sm text-gray-600 space-y-2">
-                <p>
-                  Date d'envoi:{" "}
-                  {new Date(nextOrder.sendDate).toLocaleDateString("fr-FR")}
-                </p>
-                <p>
-                  Statut:
-                  <span
-                    className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                      nextOrder.status === "pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : nextOrder.status === "received"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {getStatusLabel(nextOrder.status)}
-                  </span>
-                </p>
-              </div>
-            </div>
-          ) : (
-            <p className="text-gray-600">Aucune commande en cours</p>
-          )}
         </div>
+      ))
+    ) : (
+      <p className="text-gray-600">Aucune commande précédente</p>
+    )}
+  </div>
+</div>
+
       </div>
     </div>
   );

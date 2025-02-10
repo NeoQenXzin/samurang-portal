@@ -1,3 +1,16 @@
+:root {
+    --background-opacity: 0.1;
+    --card-opacity: 0.85;
+    --accent-color: rgba(218, 165, 32, 0.8);
+}
+
+html,
 body {
-    background-color: skyblue;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom,
+            #1a1a1a 0%,
+            #0a0a0a 50%,
+            #000000 100%);
 }

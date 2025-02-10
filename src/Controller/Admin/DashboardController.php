@@ -64,15 +64,14 @@ class DashboardController extends AbstractDashboardController
         );
         yield MenuItem::linkToCrud('Formations', 'fas fa-graduation-cap', Formation::class);
         yield MenuItem::linkToCrud('Next Order', 'fas fa-shopping-cart', NextOrder::class);
-        yield MenuItem::linktoRoute(
+        yield MenuItem::linkToUrl(
             'Back to the website',
             'fas fa-home',
-            'homepage'
-              // 'process.env.REACT_APP_site_URL || "http://localhost:3000";'
+            $_ENV['REACT_APP_site_URL'] ?? 'http://localhost:3000'
         );
     }
 
-   
+
 
     public function configureAssets(): Assets
     {
