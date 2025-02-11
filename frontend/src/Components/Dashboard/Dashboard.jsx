@@ -55,35 +55,6 @@ export default function Dashboard() {
       .sort((a, b) => new Date(a.startDate) - new Date(b.startDate)); // Trier par date
   };
 
-  // Afficher tout les prochains évenements auquel l'utilisateur est inscrit
-  // const getUserEvents = () => {
-  //   if (!events || !userData?.user) return [];
-
-  //   // console.log("Events:", events); // Pour le debug
-  //   // console.log("User:", userData.user); // Pour le debug
-
-  //   const userEvents = events.filter((event) => {
-  //     if (userData.user.roles.includes("ROLE_INSTRUCTOR")) {
-  //       return (
-  //         event.instructorParticipants &&
-  //         Array.isArray(event.instructorParticipants) &&
-  //         event.instructorParticipants.some((p) => p.id === userData.user.id)
-  //       );
-  //     }
-  //     return (
-  //       event.studentParticipants &&
-  //       Array.isArray(event.studentParticipants) &&
-  //       event.studentParticipants.some((p) => p.id === userData.user.id)
-  //     );
-  //   });
-
-  //   // console.log("Filtered events:", userEvents); // Pour le debug
-
-  //   return userEvents.sort(
-  //     (a, b) => new Date(a.startDate) - new Date(b.startDate)
-  //   );
-  // };
-  // console.log(getUserEvents());
 
   // Afficher le statut de la commande
   const getStatusLabel = (status) => {
@@ -133,6 +104,7 @@ export default function Dashboard() {
 
   const nextOrder = getNextOrder();
   const previousOrders = getPreviousOrders();
+
 
   return (
     <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
