@@ -54,6 +54,11 @@ class CurrentUserController extends AbstractController
             $userData['firstname'] = $user->getFirstname();
             $userData['lastname'] = $user->getLastname();
             $userData['mail'] = $user->getMail();
+            $userData['sexe'] = $user->getSexe();
+            $userData['adress'] = $user->getAdress();
+            $userData['passport'] = $user->getPassport();
+            $userData['tel'] = $user->getTel();
+            $userData['birthdate'] = $user->getBirthdate();
             if ($user->getDojang()) {
                 $userData['dojang'] = [
                     'id' => $user->getDojang()->getId(),
