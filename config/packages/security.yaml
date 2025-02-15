@@ -36,6 +36,8 @@ security:
             stateless: true
             provider: app_user_provider
             jwt: ~
+            # refresh_jwt:
+            #     check_path: /api/token/refresh
         main:
             lazy: true
             provider: app_user_provider

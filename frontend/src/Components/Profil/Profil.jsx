@@ -65,7 +65,7 @@ export default function Profil() {
                                     : student.grade.id;
 
                             if (!gradeId) {
-                                console.warn(`Grade ID is missing for student ${student.id}.`);
+                                console.warn(`grade ID manquant pour student ${student.id}.`);
                                 grades[student.id] = "Non défini";
                                 continue;
                             }
@@ -74,7 +74,7 @@ export default function Profil() {
                             grades[student.id] = response.data.name;
                         } catch (error) {
                             console.error(
-                                `Erreur lors du chargement du grade pour l'étudiant ${student.id}:`,
+                                `Erreur lors du chargement du grade pour student ${student.id}:`,
                                 error
                             );
                             grades[student.id] = "Non défini";

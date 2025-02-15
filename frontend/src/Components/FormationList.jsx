@@ -29,11 +29,15 @@ function FormationsList() {
   // Vérifier si l'utilisateur participe à un événement
   const isUserParticipating = (formation) => {
     if (!userData?.user) return false;
-    
+    // Vérifier si l'utilisateur est un instructeur
     if (userData.user.roles.includes("ROLE_INSTRUCTOR")) {
-      return formation.instructorParticipants?.some(p => p.id === userData.user.id);
+      return formation.instructorParticipants?.some(participant => participant.id === userData.user.id);
     }
-    return formation.studentParticipants?.some(p => p.id === userData.user.id);
+    // Vérifier si l'utilisateur est un étudiant
+    if (userData.user.roles.includes("ROLE_STUDENT")) {
+      return formation.studentParticipants?.some(participant => participant.id === userData.user.id);
+    }
+    return false;
   };
 
   // Gérer le changement de participation à un événement
@@ -80,7 +84,7 @@ function FormationsList() {
                 </div>
               </div>
 
-              {/* Afficher le bouton d'inscription ou de désinscription en fonction de si l'événement est passé ou non */}
+              {/* Afficher le bouton d'inscription ou de désinscription en fonction de si  l'événement est passé ou non */}
               {!isPast && (
                 <div className="flex space-x-4">
                   <button

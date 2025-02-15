@@ -22,7 +22,6 @@ export const fetchUserProfile = createAsyncThunk(
           students = studentsResponse.data.member || [];
         } catch (error) {
           console.warn('Erreur lors du chargement des étudiants:', error);
-          //provisoire  Continue without students data if there's an error
         }
       }
 

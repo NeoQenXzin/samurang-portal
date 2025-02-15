@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
+// Récupérer les événements
 export const fetchEvents = createAsyncThunk('events/fetchEvents', async (_, { rejectWithValue }) => {
     try {
         const token = localStorage.getItem('token');
@@ -32,6 +33,7 @@ export const toggleEventParticipation = createAsyncThunk(
         return rejectWithValue('Token non trouvé');
       }
 
+      // Inscription ou désinscription à l'événement
       const endpoint = isParticipating ? 'unregister' : 'register';
       await axios.post(
         `${API_URL}/api/formations/${formationId}/${endpoint}`,
@@ -46,6 +48,7 @@ export const toggleEventParticipation = createAsyncThunk(
         headers: { Authorization: `Bearer ${token}` }
       });
 
+      // Retourner les événements modifiés
       return response.data.member || [];
     } catch (error) {
       return rejectWithValue('Erreur lors de la modification de l\'inscription');

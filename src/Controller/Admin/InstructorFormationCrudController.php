@@ -64,16 +64,16 @@ class InstructorFormationCrudController extends AbstractCrudController
         yield DateTimeField::new('endDate');
         yield TextField::new('location');
         yield TextField::new('url');
-        yield AssociationField::new('organizer');
-        yield IntegerField::new('participantsCount')->setLabel('Nombre de participants');
-        yield  AssociationField::new('organizer')
+        yield AssociationField::new('organizer')
             ->setFormTypeOption('disabled', true)
             ->setFormTypeOption('data', $this->security->getUser())
             ->setRequired(true);
-        // yield AssociationField::new('instructorParticipants')->setLabel('Instructeurs participants');
-        // yield AssociationField::new('studentParticipants')->setLabel('Étudiants participants');
+        yield IntegerField::new('participantsCount')
+            ->setLabel('Nombre de participants')
+            ->setFormTypeOption('disabled', true);
         yield CollectionField::new('instructorParticipants')
             ->setLabel('Instructeurs inscrits')
+            ->setFormTypeOption('disabled', true)
             ->formatValue(function ($value, $entity) {
                 return implode(', ', array_map(function ($instructor) {
                     return $instructor->getFirstname() . ' ' . $instructor->getLastname();
@@ -81,6 +81,7 @@ class InstructorFormationCrudController extends AbstractCrudController
             });
         yield CollectionField::new('studentParticipants')
             ->setLabel('Étudiants inscrits')
+            ->setFormTypeOption('disabled', true)
             ->formatValue(function ($value, $entity) {
                 return implode(', ', array_map(function ($student) {
                     return $student->getFirstname() . ' ' . $student->getLastname();
