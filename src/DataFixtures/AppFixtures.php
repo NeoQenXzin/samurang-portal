@@ -209,6 +209,7 @@ class AppFixtures extends Fixture
             ],
         ];
 
+        $formationEntities = [];
         foreach ($formations as $formationData) {
             $formation = new Formation();
             $formation->setType($formationData['type']);
@@ -218,7 +219,28 @@ class AppFixtures extends Fixture
             $formation->setLocation($formationData['location']);
             $formation->setOrganizer($formationData['organizer']);
             $manager->persist($formation);
+            $formationEntities[] = $formation;
         }
+
+        // Ajout des participants aux formations
+
+        // Formation 1 : Stage technique (organisé par Park)
+        $stageFormation = $formationEntities[0];
+        // Ajout de l'instructeur Martin comme participant
+        $stageFormation->addParticipant($instructorEntities[1]);
+       
+
+        // Formation 2 : Préparation Dan (organisé par Martin)
+        $danFormation = $formationEntities[1];
+        // Ajout de l'instructeur Park comme participant
+        $danFormation->addParticipant($instructorEntities[0]);
+       
+
+        // Formation 3 : Stage Combat (organisé par Dupont)
+        $combatFormation = $formationEntities[2];
+        // Ajout de l'instructeur Laurent comme participant
+        $combatFormation->addParticipant($instructorEntities[3]);
+        $combatFormation->addParticipant($instructorEntities[2]);
 
         $manager->flush();
     }
